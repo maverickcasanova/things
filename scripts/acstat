@@ -1,0 +1,5 @@
+#!/bin/bash
+# Script for conky, display status of AC Adapter.
+
+acpi_output=( $(acpi -pa) )
+echo "AC Adapter ${acpi_output[2]}"

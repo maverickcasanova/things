@@ -1,0 +1,6 @@
+#!/bin/bash
+# Script for conky, display status of Battery..
+
+acpi_output=( $(acpi -pb) )
+output="${acpi_output[@]:2:4}"
+echo "${output^}"

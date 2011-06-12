@@ -1,0 +1,23 @@
+#!/bin/dash
+# Volume control.
+
+up() {
+	amixer -q set Master 2+ unmute
+}
+
+down() {
+	amixer -q set Master 2- unmute
+}
+
+mute() {
+	amixer -q set Master mute
+}
+
+case $1 in
+	up|down|mute)
+		$1
+	;;
+	*)
+		echo "Zjebales." && exit 1
+	;;
+esac

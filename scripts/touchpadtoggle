@@ -1,0 +1,13 @@
+#!/bin/dash
+# Toggle touchpad.
+
+status="$(synclient -l |grep TouchpadOff | cut -d "=" -f 2)"
+
+if [ "$status" = " 1" ]; then
+	synclient TouchpadOff=0
+elif [ "$status" = " 0" ]; then
+	synclient TouchpadOff=1
+else
+	echo "The fuck is this? Status = '${status}'".
+	exit 1
+fi

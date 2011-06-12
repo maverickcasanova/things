@@ -1,0 +1,3 @@
+#!/bin/dash
+# Current outgoing IP.
+curl http://checkip.dyndns.org -s | sed 's/.*ss:\ //;s/<\/b.*//'
