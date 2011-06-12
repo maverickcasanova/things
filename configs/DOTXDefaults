@@ -1,0 +1,21 @@
+URxvt.foreground: #fff
+URxvt.background: #000
+URxvt*scrollBar:false
+xterm*foreground: #fff
+xterm*background: #000
+URxvt*perl-ext-common: selection-autotransform,matcher
+URxvt*urlLauncher: defaultbrowser
+URxvt*matcher.button: 1
+XTerm*eightBitInput: true
+XTerm*altSendsEscape: true
+XTerm*metaSendsEscape: true
+
+urxvt.font: xft:Terminus:style=regular:size=11:antialias=false:lang=pl,xft:DejaVu Sans Mono:style=Bold:antialias=false
+
+
+urxvt*color12: #729FCF
+urxvt*geometry: 90x24
+urxvt*termName: rxvt-256color
+
+!urxvt*loginShell: true
+

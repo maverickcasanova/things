@@ -1,0 +1,21 @@
+# example usage in mplayer:
+#	mplayer -ao alsa:device=51to20 movie-with-6-channel-sound.mkv
+
+pcm.51to20 {
+   type route
+   slave.pcm default
+   slave.channels 6
+   ttable.0.0 1      # front left -> left
+   ttable.1.1 1      # front right -> right
+   ttable.2.0 0.707  # back left -> left, gain 3dB
+   ttable.3.1 0.707  # back right -> right, gain 3dB
+   ttable.4.0 0.5    # center -> left, gain 6dB
+   ttable.4.1 0.5    # center -> right, gain 6dB
+   ttable.5.0 0.5    # LFE -> left, gain 6dB
+   ttable.5.1 0.5    # LFE -> right, gain 6dB
+}
+
+ctl.51to20 {
+   type hw
+   card 0
+}
