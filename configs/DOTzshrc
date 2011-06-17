@@ -131,7 +131,7 @@ case $TERM in
 
 	screen|screen-*)
 		bindkey "^[[1~" beginning-of-line #Home key
-		bindkey "^[[8~" end-of-line #End key
+		bindkey "^[[4~" end-of-line #End key
 		bindkey "^[[3~" delete-char #Del key
 		bindkey "^[[A" history-beginning-search-backward #Up Arrow
 		bindkey "^[[B" history-beginning-search-forward #Down Arrow
