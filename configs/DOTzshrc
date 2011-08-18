@@ -160,34 +160,32 @@ confirm() {
 	read -q answer
 	if [[ "${answer}" =~ ^[Yy]$ ]]; then
 		echo
-		command "${=@}"
+		command "${=1}" "${=@:2}"
 	elif [[ "${answer}" =~ ^[Nn]$ ]]; then
 		echo
 	fi
 }
 
-poweroff() {
-	local runcommand
-	if [ -n "${USER}" ] && [ "${USER}" != 'root' ]; then
-		runcommand="sudo poweroff"
-	else
-		runcommand='poweroff'
+confirm_wrapper() {
+	if [ "$1" = '--root' ]; then
+		local as_root='true'
+		shift
+	fi
+
+	local runcommand="$1"; shift
+
+	if [ "${as_root}" = 'true' ] && [ "${USER}" != 'root' ]; then
+		runcommand="sudo ${runcommand}"
 	fi
 	confirm "${runcommand}" "$@"
 }
 
-reboot() {
-	local runcommand
-	if [ -n "${USER}" ] && [ "${USER}" != 'root' ]; then
-		runcommand='sudo reboot'
-	else
-		runcommand='reboot'
-	fi
-	confirm "${runcommand}" "$@"
-}
+poweroff() { confirm_wrapper --root $0 "$@"; }
+reboot() { confirm_wrapper --root $0 "$@"; }
+hibernate() { confirm_wrapper --root $0 "$@"; }
 
 detox() {
-	if [ $# -ge 1 ]; then
+	if [ "$#" -ge 1 ]; then
 		confirm detox $*
 	else	
 		command detox $*
