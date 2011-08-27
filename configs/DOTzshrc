@@ -24,6 +24,18 @@ cyan='\e[0;36m'
 CYAN='\e[1;36m'
 NC='\e[0m'
 
+# Are we running under grsecurity's RBAC?
+rbac_auth() {
+	local auth_to_role='admin'
+	if [ "${USER}" = 'root' ]; then
+		if ! grep -qE '^RBAC:' "/proc/self/status" && which gradm > /dev/null 2>&1; then
+			echo -e "\n${BLUE}*${NC} ${GREEN}RBAC${NC} Authorize to '${auth_to_role}' RBAC role."
+			gradm -a "${auth_to_role}"
+		fi
+	fi
+}
+#rbac_auth
+
 # extended globbing, awesome!
 setopt extendedGlob
 
