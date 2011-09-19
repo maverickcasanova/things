@@ -60,13 +60,18 @@ if [ "$USER" = 'root' ] && [ "$(cut -d ' ' -f 19 /proc/$$/stat)" -gt 0 ]; then
 fi
 
 # Fancy prompt.
+if [ -n "${SSH_CLIENT}" ]; then
+	prompt_isSSH='%F{blue}[%F{253}SSH%F{blue}] '
+else
+	unset prompt_isSSH
+fi
 case $USER in
 	root)
-		export PS1='%B%F{cyan}%m%k %(?..%F{blue}[%F{253}%?%F{blue}] )%B%F{blue}%1~ %# %b%f%k'
+		export PS1="%B%F{cyan}%m%k %(?..%F{blue}[%F{253}%?%F{blue}] )${prompt_isSSH}%B%F{blue}%1~ %# %b%f%k"
 	;;
 
 	*)	
-		export PS1='%B%F{blue}%n@%m%k %(?..%F{blue}[%F{253}%?%F{blue}] )%B%F{cyan}%1~ %# %b%f%k'
+		export PS1="%B%F{blue}%n@%m%k %(?..%F{blue}[%F{253}%?%F{blue}] )${prompt_isSSH}%B%F{cyan}%1~ %# %b%f%k"
 	;;
 esac
 
