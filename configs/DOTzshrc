@@ -71,14 +71,6 @@ detox() {
 	fi
 }
 
-# Include user-specified configs.
-if [ ! -d "${ZSHDDIR}" ]; then
-	mkdir -p "${ZSHDDIR}" && echo "# Put your user-specified config here." > "${ZSHDDIR}/example.zsh"
-fi
-
-for zshd in $(ls -A ${HOME}/.config/zsh.d/^*.(z)sh$); do
-	. "${zshd}"
-done
 
 # Are we running under grsecurity's RBAC?
 rbac_auth() {
@@ -101,6 +93,16 @@ autoload -U zmv
 
 # zargs, as an alternative to find -exec and xargs.
 autoload -U zargs
+
+
+# Include user-specified configs.
+if [ ! -d "${ZSHDDIR}" ]; then
+	mkdir -p "${ZSHDDIR}" && echo "# Put your user-specified config here." > "${ZSHDDIR}/example.zsh"
+fi
+
+for zshd in $(ls -A ${HOME}/.config/zsh.d/^*.(z)sh$); do
+	. "${zshd}"
+done
 
 # Completion.
 autoload -Uz compinit
@@ -180,8 +182,8 @@ case $TERM in
 		preexec () {
 			# Escape '%' char.
 			zsh_cmd_title="${(V)1//\%/\%\%}"
-			# Convert new lines in command to spaces.
-			zsh_cmd_title="${zsh_cmd_title//$'\n'/ }"
+			# Convert \\n to spaces. Happen with multi-line cmd with \ on the end of each line.
+			zsh_cmd_title="${zsh_cmd_title//\\\\n/ }"
 			# Escape '\' char.
 			zsh_cmd_title="${zsh_cmd_title//\\/\\\\}"
 			print -Pn "\e]0;${zsh_cmd_title} [%n@%m: %~]\a"
