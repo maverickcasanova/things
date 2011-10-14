@@ -24,6 +24,62 @@ cyan='\e[0;36m'
 CYAN='\e[1;36m'
 NC='\e[0m'
 
+# Functions
+if [ -f '/etc/profile.d/prll.sh' ]; then
+	. "/etc/profile.d/prll.sh"
+fi
+
+reload () {
+          exec "${SHELL}" "$@"
+}
+
+confirm() {
+	local answer
+	echo -ne "zsh: sure you want to run '${YELLOW}$@${NC}' [yN]? "
+	read -q answer
+		echo
+	if [[ "${answer}" =~ ^[Yy]$ ]]; then
+		command "${=1}" "${=@:2}"
+	else
+		return 1
+	fi
+}
+
+confirm_wrapper() {
+	if [ "$1" = '--root' ]; then
+		local as_root='true'
+		shift
+	fi
+
+	local runcommand="$1"; shift
+
+	if [ "${as_root}" = 'true' ] && [ "${USER}" != 'root' ]; then
+		runcommand="sudo ${runcommand}"
+	fi
+	confirm "${runcommand}" "$@"
+}
+
+poweroff() { confirm_wrapper --root $0 "$@"; }
+reboot() { confirm_wrapper --root $0 "$@"; }
+hibernate() { confirm_wrapper --root $0 "$@"; }
+
+detox() {
+	if [ "$#" -ge 1 ]; then
+		confirm detox $*
+	else	
+		command detox $*
+	fi
+}
+
+# Include user-specified configs.
+if [ ! -d "${ZSHDDIR}" ]; then
+	mkdir -p "${ZSHDDIR}" && echo "# Put your user-specified config here." > "${ZSHDDIR}/example.zsh"
+fi
+
+for zshd in $(ls -A ${HOME}/.config/zsh.d/^*.(z)sh$); do
+	. "${zshd}"
+done
+
 # Are we running under grsecurity's RBAC?
 rbac_auth() {
 	local auth_to_role='admin'
@@ -36,6 +92,7 @@ rbac_auth() {
 }
 #rbac_auth
 
+# Le features!
 # extended globbing, awesome!
 setopt extendedGlob
 
@@ -170,60 +227,5 @@ esac
 bindkey "^R" history-incremental-pattern-search-backward 
 bindkey "^S" history-incremental-pattern-search-forward
 
-# Functions
-if [ -f '/etc/profile.d/prll.sh' ]; then
-	. "/etc/profile.d/prll.sh"
-fi
-
-reload () {
-          exec "${SHELL}" "$@"
-}
-
-confirm() {
-	local answer
-	echo -ne "zsh: sure you want to run '${YELLOW}$@${NC}' [yN]? "
-	read -q answer
-		echo
-	if [[ "${answer}" =~ ^[Yy]$ ]]; then
-		command "${=1}" "${=@:2}"
-	else
-		return 1
-	fi
-}
-
-confirm_wrapper() {
-	if [ "$1" = '--root' ]; then
-		local as_root='true'
-		shift
-	fi
-
-	local runcommand="$1"; shift
-
-	if [ "${as_root}" = 'true' ] && [ "${USER}" != 'root' ]; then
-		runcommand="sudo ${runcommand}"
-	fi
-	confirm "${runcommand}" "$@"
-}
-
-poweroff() { confirm_wrapper --root $0 "$@"; }
-reboot() { confirm_wrapper --root $0 "$@"; }
-hibernate() { confirm_wrapper --root $0 "$@"; }
-
-detox() {
-	if [ "$#" -ge 1 ]; then
-		confirm detox $*
-	else	
-		command detox $*
-	fi
-}
-
-# Include user-specified configs.
-if [ ! -d "${ZSHDDIR}" ]; then
-	mkdir -p "${ZSHDDIR}" && echo "# Put your user-specified config here." > "${ZSHDDIR}/example.zsh"
-fi
-
-for zshd in $(ls -A ${HOME}/.config/zsh.d/^*.(z)sh$); do
-	. "${zshd}"
-done
 
 if [ -f ~/.alert ]; then cat ~/.alert; fi
