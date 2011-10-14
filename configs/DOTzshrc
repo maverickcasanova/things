@@ -124,7 +124,7 @@ case $TERM in
 			# Escape '%' char.
 			zsh_cmd_title="${(V)1//\%/\%\%}"
 			# Convert new lines in command to spaces.
-			zsh_cmd_title="${zsh_cmd_title//\\n/ }"
+			zsh_cmd_title="${zsh_cmd_title//$'\n'/ }"
 			# Escape '\' char.
 			zsh_cmd_title="${zsh_cmd_title//\\/\\\\}"
 			print -Pn "\e]0;${zsh_cmd_title} [%n@%m: %~]\a"
