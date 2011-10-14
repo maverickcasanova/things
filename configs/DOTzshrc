@@ -71,6 +71,36 @@ detox() {
 	fi
 }
 
+termtitle() {
+	case "$TERM" in
+		rxvt*|xterm|nxterm|gnome|screen)
+			case "$1" in
+				precmd)
+					print -Pn "\e]0;%n@%m: %~\a"
+				;;
+				preexec)
+					# Escape '%' char.
+					zsh_cmd_title="${2//\%/\%\%}"
+					# Convert \\n to spaces. Happen with multi-line cmd with \ on the end of each line.
+					zsh_cmd_title="${zsh_cmd_title//\\\\n/ }"
+					# Escape '\' char.
+					zsh_cmd_title="${zsh_cmd_title//\\/\\\\}"
+					print -Pn "\e]0;${zsh_cmd_title} [%n@%m: %~]\a"
+				;;
+			esac
+		;;
+	esac
+}
+
+precmd() {
+	# Set terminal title.
+	termtitle precmd
+}
+
+preexec() {
+	# Set terminal title along with current executed command pass as second argument
+	termtitle preexec "${(V)1}"
+}
 
 # Are we running under grsecurity's RBAC?
 rbac_auth() {
@@ -175,21 +205,6 @@ alias grep='grep --colour=auto'
 alias egrep='egrep --colour=auto'
 alias ls='ls --color=auto --human-readable --group-directories-first --classify'
 
-# Term title
-case $TERM in
-	rxvt*|xterm|nxterm|gnome|screen)
-		precmd () {print -Pn "\e]0;%n@%m: %~\a"}
-		preexec () {
-			# Escape '%' char.
-			zsh_cmd_title="${(V)1//\%/\%\%}"
-			# Convert \\n to spaces. Happen with multi-line cmd with \ on the end of each line.
-			zsh_cmd_title="${zsh_cmd_title//\\\\n/ }"
-			# Escape '\' char.
-			zsh_cmd_title="${zsh_cmd_title//\\/\\\\}"
-			print -Pn "\e]0;${zsh_cmd_title} [%n@%m: %~]\a"
-		}
-	;;
-esac
 
 # Keys.
 case $TERM in
