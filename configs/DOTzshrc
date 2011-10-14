@@ -120,7 +120,13 @@ alias ls='ls --color=auto --human-readable --group-directories-first --classify'
 case $TERM in
 	rxvt*|xterm|nxterm|gnome|screen)
 		precmd () {print -Pn "\e]0;%n@%m: %~\a"}
-		preexec () { print -Pn "\e]0;${(fV)1} [%n@%m: %~]\a"}
+		preexec () {
+			# Escape '%' char.
+			zsh_cmd_title="${(V)1//\%/\%\%}"
+			# Escape '\' char.
+			zsh_cmd_title="${zsh_cmd_title//\\/\\\\}"
+			print -Pn "\e]0;${zsh_cmd_title} [%n@%m: %~]\a"
+		}
 	;;
 esac
 
