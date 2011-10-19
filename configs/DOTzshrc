@@ -79,12 +79,12 @@ termtitle() {
 					print -Pn "\e]0;%n@%m: %~\a"
 				;;
 				preexec)
-					# Escape '%' char.
-					zsh_cmd_title="${2//\%/\%\%}"
-					# Convert \\n to spaces. Happen with multi-line cmd with \ on the end of each line.
-					zsh_cmd_title="${zsh_cmd_title//\\\\n/ }"
+					zsh_cmd_title="$2"
 					# Escape '\' char.
 					zsh_cmd_title="${zsh_cmd_title//\\/\\\\}"
+					# Escape '%' char. Do we really need it after escaping '\'?
+					#zsh_cmd_title="${zsh_cmd_title//\%/\%\%}"
+
 					print -Pn "\e]0;${zsh_cmd_title} [%n@%m: %~]\a"
 				;;
 			esac
