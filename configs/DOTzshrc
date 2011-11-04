@@ -83,8 +83,10 @@ termtitle() {
 					# Escape '\' char.
 					zsh_cmd_title="${zsh_cmd_title//\\/\\\\}"
 					# Escape '%' char.
-					zsh_cmd_title="${zsh_cmd_title//\%/\%\%}"
-
+					#zsh_cmd_title="${zsh_cmd_title//%/\%\%}"
+					# As I am unable to deal with all %, especialy
+					# the nasted one, I will just strip this char.
+					zsh_cmd_title="${zsh_cmd_title//\%/<percent>}"
 					print -Pn "\e]0;${zsh_cmd_title} [%n@%m: %~]\a"
 				;;
 			esac
@@ -120,6 +122,7 @@ git_check_if_worktree() {
 	if [ -d '.git' ] || git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
 		git_pwd_is_worktree='true'
 	else
+		unset git_branch
 		git_pwd_is_worktree='false'
 	fi
 }
