@@ -47,7 +47,7 @@ fi
 
 if ! [ -f "${homedir}/.alock.passwd" ]; then
 	eerror "Create '${homedir}/.alock.passwd' file with sha512-hash of password for unlocking screen."
-	eerror "Example: echo 'password' -n | sha512sum | cut -c -128"
+	eerror "Example: echo -n 'password' | sha512sum | cut -c -128"
 	exit 1
 fi
 
