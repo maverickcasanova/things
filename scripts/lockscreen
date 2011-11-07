@@ -19,9 +19,6 @@
 
 # todo: do lock, don't run alock twice.
 
-# Yep, support for just one, default xsession.
-export DISPLAY="${DISPLAY:-:0}"
-
 eerror() { echo -e "\033[1;31m>>> \033[0m$@"; }
 einfo() { echo -e "\033[1;32m>>> \033[0m$@"; }
 
@@ -41,6 +38,7 @@ if [ "${UID}" = '0' ]; then
 		eerror "Unable to get ${xsession_username}'s home dir path."; exit 1
 	fi
 else
+	export DISPLAY="${DISPLAY:-:0}"
 	xsession_username="$USER"
 	homedir="$HOME"
 fi
