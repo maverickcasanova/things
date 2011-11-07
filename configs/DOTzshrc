@@ -82,6 +82,8 @@ termtitle() {
 					zsh_cmd_title="$2"
 					# Escape '\' char.
 					zsh_cmd_title="${zsh_cmd_title//\\/\\\\}"
+					# Escape '$' char.
+					zsh_cmd_title="${zsh_cmd_title//\$/\\\\\$}"
 					# Escape '%' char.
 					#zsh_cmd_title="${zsh_cmd_title//%/\%\%}"
 					# As I am unable to deal with all %, especialy
@@ -121,8 +123,9 @@ git_check_if_worktree() {
 	#	damn annoying RBAC messages about Access denied there.
 	if [ -d '.git' ] || git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
 		git_pwd_is_worktree='true'
+		git_worktree_is_bare="$(git config core.bare)"
 	else
-		unset git_branch
+		unset git_branch git_worktree_is_bare
 		git_pwd_is_worktree='false'
 	fi
 }
@@ -134,7 +137,7 @@ git_branch() {
 }
 
 git_dirty() {
-	if [ -n "$(git status --untracked-files='no' --porcelain)" ]; then
+	if [ "${git_worktree_is_bare}" = 'false' ] && [ -n "$(git status --untracked-files='no' --porcelain)" ]; then
 		git_dirty='%F{green}*'
 	else
 		unset git_dirty
