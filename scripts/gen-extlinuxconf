@@ -42,7 +42,6 @@ MENU COLOR unsel	37;40
 
 # The 'biggest' version kernel first.
 for bzImage in $(sort -r < <(printf '%s\n' /boot/bzImage-*)); do
-	kernelimages+=( "${kernelimage##*/}" )
 	kernelentrynumber="${kernelentrynumber:-1}"
 	echo "LABEL kernel${kernelentrynumber}_${bzImage##*/}"
 	echo "	MENU LABEL ${menu_entry_name} ${bzImage##*/}"
