@@ -23,6 +23,8 @@ kernel_params="rootfstype=ext4 luks enc_root=/dev/sda2 lvm root=/dev/mapper/vg-r
 initramfs="initramfs.cpio.gz"
 ##
 
+shopt -s nullglob
+
 if [ "$(stat -c '%d' '/')" = "$(stat -c '%d' '/boot')" ]; then
 	bootdir='/boot'
 else
@@ -72,6 +74,7 @@ if [ -f '/boot/extlinux/memdisk' ]; then
 		elif [[ "${diskimage##*/}" =~ ^.*.img$ ]]; then
 			echo "	APPEND raw"
 		fi
+		memdiskentrynumber="$((memdiskentrynumber+1))"
 		echo
 	done
 fi
