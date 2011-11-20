@@ -1,0 +1,63 @@
+#!/bin/bash
+#
+# Simple config generator for extlinux (syslinux).
+#
+# Copyright (c) 2011, Piotr Karbowski <piotr.karbowski@gmail.com>
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without modification, are
+# permitted provided that the following conditions are met:
+#
+# * Redistributions of source code must retain the above copyright notice, this
+#   list of conditions and the following disclaimer.
+# * Redistributions in binary form must reproduce the above copyright notice, this
+#   list of conditions and the following disclaimer in the documentation and/or other
+#   materials provided with the distribution.
+# * Neither the name of the Piotr Karbowski nor the names of its contributors may be
+#   used to endorse or promote products derived from this software without specific
+#   prior written permission.
+
+## config
+menu_entry_name="Gentoo Linux"
+kernel_params="rootfstype=ext4 luks enc_root=/dev/sda2 lvm root=/dev/mapper/vg-rootfs"
+initramfs="initramfs.cpio.gz"
+##
+
+declare -a kernelimages
+
+while read -d $'\0' kernelimage; do
+	kernelimages+=( "${kernelimage##*/}" )
+done < <(find /boot -type f -name 'bzImage-*' -print0)
+
+if [ "$(stat -c '%d' '/')" = "$(stat -c '%d' '/boot')" ]; then
+	bootdir='/boot'
+else
+	bootdir=''
+fi
+
+echo "# This configuration file was generated automatically by gen-extlinuxconf.
+
+TIMEOUT 30
+UI menu.c32
+
+MENU TITLE Boot Menu
+MENU COLOR title	1;37;40
+MENU COLOR border	30;40
+MENU COLOR unsel	37;40
+"
+
+for bzImage in "${kernelimages[@]}"; do
+	entrynumber="${entrynumber:-1}"
+	echo "LABEL kernel${entrynumber}_${bzImage}"
+	echo "	MENU LABEL ${menu_entry_name} ${bzImage}"
+	echo "	LINUX ${bootdir}/${bzImage}"
+	if [ -n "${initramfs}" ] && [ -f "/boot/${initramfs}" ]; then
+		echo "	INITRD ${bootdir}/${initramfs}"
+	fi
+	if [ -n "${kernel_params}" ]; then
+		echo "	APPEND ${kernel_params}"
+	fi
+
+	entrynumber="$((entrynumber+1))"
+	echo
+done
