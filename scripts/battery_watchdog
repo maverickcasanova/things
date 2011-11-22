@@ -1,0 +1,71 @@
+#!/bin/sh
+#
+# battery_watchdog v0.1 - Shutdown (graceful or hardcore) system when battery is low.
+#
+# Copyright (c) 2011, Piotr Karbowski <piotr.karbowski@gmail.com>
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without modification, are
+# permitted provided that the following conditions are met:
+#
+# * Redistributions of source code must retain the above copyright notice, this
+#   list of conditions and the following disclaimer.
+# * Redistributions in binary form must reproduce the above copyright notice, this
+#   list of conditions and the following disclaimer in the documentation and/or other
+#   materials provided with the distribution.
+# * Neither the name of the Piotr Karbowski nor the names of its contributors may be
+#   used to endorse or promote products derived from this software without specific
+#   prior written permission.
+
+# Adjust battery_dir and ac_dir to proper paths.
+battery_dir='/proc/acpi/battery/BAT0'
+ac_dir='/proc/acpi/ac_adapter/AC'
+
+interval=''
+while :; do
+	interval="${interval:-60}"
+	ac="$(awk '/state:/ {print $2}' "/proc/acpi/ac_adapter/AC/state")"
+	if [ "${ac}" = 'off-line' ]; then
+		battery_remaining="$(awk '/remaining capacity:/ {print $3}' "${battery_dir}/state")"
+		battery_total="$(awk '/last full capacity:/ {print $4}' "${battery_dir}/info")"
+		battery_percent="$((battery_remaining*100/battery_total))"
+
+		if [ "${battery_percent}" -le '5' ]; then
+			# 5% or less remaining power in the battery.
+			logger -t 'battery watchdog' "Hardcore emergency shutdown, ${battery_percent}% battery left."
+			# Sync all filesystems, inital sync.
+			echo 's' > '/proc/sysrq-trigger'
+			# Wait 5s
+			sleep 5
+			# Another sync.
+			echo 's' > '/proc/sysrq-trigger'
+			# Wait 3s
+			sleep 3
+			# Another sync.
+			echo 's' > '/proc/sysrq-trigger'
+			# Wait just 1s
+			sleep 1
+			# Remount all filesystems in read-only
+			echo 'r' > '/proc/sysrq-trigger'
+			# Wait 3s
+			sleep 3
+			# Poweroff machine
+			echo 'o' > '/proc/sysrq-trigger'
+		elif [ "${battery_percent}" -le '10' ]; then
+			# Hibernate? Poweroff?
+			logger -t 'battery watchdog' "Emergency shutdown, ${battery_percent}% battery left."
+			poweroff
+		elif [ "${battery_percent}" -le '15' ]; then
+			# 15% or less in the battery.
+			# Changing interval to 30s
+			interval='30'
+		else
+			# Reset interval to 60s.
+			interval='60'
+		fi
+		sleep "${interval}"
+	else
+		# Running on AC. Wait minute before next check.
+		sleep 60
+	fi
+done
