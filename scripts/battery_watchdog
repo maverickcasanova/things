@@ -24,7 +24,7 @@ ac_dir='/proc/acpi/ac_adapter/AC'
 interval=''
 while :; do
 	interval="${interval:-60}"
-	ac="$(awk '/state:/ {print $2}' "/proc/acpi/ac_adapter/AC/state")"
+	ac="$(awk '/state:/ {print $2}' "${ac_dir}/state")"
 	if [ "${ac}" = 'off-line' ]; then
 		battery_remaining="$(awk '/remaining capacity:/ {print $3}' "${battery_dir}/state")"
 		battery_total="$(awk '/last full capacity:/ {print $4}' "${battery_dir}/info")"
