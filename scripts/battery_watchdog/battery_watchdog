@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# battery_watchdog v0.1 - Shutdown (graceful or hardcore) system when battery is low.
+# battery_watchdog v0.2 - Shutdown (graceful or hardcore) system when battery is low.
 #
 # Copyright (c) 2011, Piotr Karbowski <piotr.karbowski@gmail.com>
 # All rights reserved.
@@ -17,19 +17,18 @@
 #   used to endorse or promote products derived from this software without specific
 #   prior written permission.
 
-# Adjust battery_dir and ac_dir to proper paths.
-battery_dir='/proc/acpi/battery/BAT0'
-ac_dir='/proc/acpi/ac_adapter/AC'
+
+# Remember to check and adjust paths below, they may not be vaild on your system!
+battery_dir='/sys/bus/acpi/drivers/battery/PNP0C0A:00/power_supply/BAT0'
+ac_dir='/sys/bus/acpi/drivers/ac/ACPI0003:00/power_supply/AC'
 
 interval=''
 while :; do
 	interval="${interval:-60}"
-	ac="$(awk '/state:/ {print $2}' "${ac_dir}/state")"
-	if [ "${ac}" = 'off-line' ]; then
-		battery_remaining="$(awk '/remaining capacity:/ {print $3}' "${battery_dir}/state")"
-		battery_total="$(awk '/last full capacity:/ {print $4}' "${battery_dir}/info")"
+	if [ "$(cat ${ac_dir}/online)" = '0' ]; then
+		battery_remaining="$(cat ${battery_dir}/charge_now)"
+		battery_total="$(cat ${battery_dir}/charge_full)"
 		battery_percent="$((battery_remaining*100/battery_total))"
-
 		if [ "${battery_percent}" -le '5' ]; then
 			# 5% or less remaining power in the battery.
 			logger -t 'battery watchdog' "Hardcore emergency shutdown, ${battery_percent}% battery left."
