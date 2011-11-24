@@ -73,7 +73,7 @@ detox() {
 
 termtitle() {
 	case "$TERM" in
-		rxvt*|xterm|nxterm|gnome|screen)
+		rxvt*|xterm|nxterm|gnome|screen|screen-*)
 			case "$1" in
 				precmd)
 					print -Pn "\e]0;%n@%m: %~\a"
