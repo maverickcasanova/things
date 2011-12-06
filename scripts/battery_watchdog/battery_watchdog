@@ -19,8 +19,10 @@
 
 
 # Remember to check and adjust paths below, they may not be vaild on your system!
-battery_dir='/sys/bus/acpi/drivers/battery/PNP0C0A:00/power_supply/BAT0'
-ac_dir='/sys/bus/acpi/drivers/ac/ACPI0003:00/power_supply/AC'
+#battery_dir='/sys/bus/acpi/drivers/battery/PNP0C0A:00/power_supply/BAT0'
+battery_dir='/sys/class/power_supply/BAT0'
+#ac_dir='/sys/bus/acpi/drivers/ac/ACPI0003:00/power_supply/AC'
+ac_dir='/sys/class/power_supply/AC'
 
 interval=''
 while :; do
