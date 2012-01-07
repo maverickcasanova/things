@@ -71,6 +71,31 @@ detox() {
 	fi
 }
 
+has() {
+	local string="${1}"
+	shift
+	local element=''
+	for element in "$@"; do
+		if [ "${string}" = "${element}" ]; then
+			return 0
+		fi
+	done
+	return 1
+}
+
+begin_with() {
+	local string="${1}"
+	shift
+	local element=''
+	for element in "$@"; do
+		if [[ "${string}" =~ "^${element}" ]]; then
+			return 0
+		fi
+	done
+	return 1
+
+}
+
 termtitle() {
 	case "$TERM" in
 		rxvt*|xterm|nxterm|gnome|screen|screen-*)
@@ -96,6 +121,8 @@ termtitle() {
 	esac
 }
 
+
+
 git_check_if_worktree() {
 	# This function intend to be only executed in chpwd().
 	# Check if the current path is in git repo.	
@@ -112,13 +139,17 @@ git_check_if_worktree() {
 		git_check_if_workdir_path="${git_check_if_workdir_path:-/root}"
 	else
 		git_check_if_workdir_path="${git_check_if_workdir_path:-/home}"
+		git_check_if_workdir_path_exclude="${git_check_if_workdir_path_exclude:-${HOME}/_sshfs}"
 	fi
-	for i in ${=git_check_if_workdir_path//:/ }; do
-		if [[ "${PWD}" =~ "^${i}" ]]; then
+
+	if begin_with "${PWD}" ${=git_check_if_workdir_path//:/ }; then
+		if ! begin_with "${PWD}" ${=git_check_if_workdir_path_exclude//:/ }; then
 			local git_pwd_is_worktree_match='true'
-			break
+		else
+			local git_pwd_is_worktree_match='false'
 		fi
-	done
+	fi
+
 	if ! [ "${git_pwd_is_worktree_match}" = 'true' ]; then
 		git_pwd_is_worktree='false'
 		return 1
