@@ -1,0 +1,26 @@
+#!/bin/sh
+# Quick and dirty s2disk wrapper.
+
+### Before suspend
+sync
+# Get current governor, save it and switch to performance.
+if which cpufreq-info > /dev/null 2>&1 && which cpufreq-set > /dev/null 2>&1; then
+	governor=$(cpufreq-info -p | cut -d ' ' -f 3)
+	cpufreq-set -r -g performance
+fi
+# Disconnect wifi connectins.
+if which wicd-cli > /dev/null 2>&1; then
+	wicd-cli --wireless --disconnect > /dev/null
+fi
+amixer -q set Master mute
+
+### Suspend to disk.
+s2disk
+
+### After resume.
+if [ -f '/usr/share/wicd/daemon/autoconnect.py' ]; then
+	/usr/share/wicd/daemon/autoconnect.py
+fi
+if which cpufreq-set > /dev/null 2>&1; then
+	cpufreq-set -r -g "${governor:-ondemand}"
+fi
