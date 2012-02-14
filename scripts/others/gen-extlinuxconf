@@ -19,7 +19,7 @@
 
 ## config
 menu_entry_name="Gentoo Linux"
-kernel_params="rootfstype=ext4 luks enc_root=/dev/sda2 lvm root=/dev/mapper/vg-rootfs"
+kernel_params="rootfstype=ext4 luks enc_root=/dev/sda2 lvm root=/dev/mapper/vg-rootfs swsusp resume=/dev/mapper/vg-swap"
 initramfs="initramfs.cpio.gz"
 ##
 
