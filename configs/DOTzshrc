@@ -244,6 +244,7 @@ zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
 zstyle ':completion:*' completer _expand _complete _ignored _approximate
 zstyle ':completion:*' menu select=2
 zstyle ':completion:*' select-prompt '%SScrolling active: current selection at %p%s'
+zstyle ':completion::complete:*' use-cache 1
 zstyle ':completion:*:descriptions' format '%U%F{cyan}%d%f%u'
 
 # If running as root and nice >0, renice to 0.
@@ -313,7 +314,7 @@ alias ls='ls --color=auto --human-readable --group-directories-first --classify'
 
 # Keys.
 case $TERM in
-	rxvt*)
+	rxvt*|xterm*)
 		bindkey "^[[7~" beginning-of-line #Home key
 		bindkey "^[[8~" end-of-line #End key
 		bindkey "^[[3~" delete-char #Del key
