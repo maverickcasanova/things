@@ -207,7 +207,7 @@ chpwd() {
 rbac_auth() {
 	local auth_to_role='admin'
 	if [ "${USER}" = 'root' ]; then
-		if ! grep -qE '^RBAC:' "/proc/self/status" && which gradm > /dev/null 2>&1; then
+		if ! grep -qE '^RBAC:' "/proc/self/status" && command -v gradm > /dev/null 2>&1; then
 			echo -e "\n${BLUE}*${NC} ${GREEN}RBAC${NC} Authorize to '${auth_to_role}' RBAC role."
 			gradm -a "${auth_to_role}"
 		fi
@@ -301,7 +301,7 @@ alias rm='rm -iv'
 alias chmod="chmod -c"
 alias chown="chown -c"
 
-if which colordiff > /dev/null 2>&1; then
+if command -v colordiff > /dev/null 2>&1; then
 	alias diff="colordiff -Nuar"
 else
 	alias diff="diff -Nuar"
