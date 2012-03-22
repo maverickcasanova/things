@@ -64,7 +64,7 @@ systray_background_id = 0
 # CLOCK
 #---------------------------------------------
 time1_format = %k:%M, %A, %d-%m-%Y
-time1_font = sans bold 8
+time1_font = DejaVu Sans bold 8
 #time2_format = %A %d %B
 #time2_font = sans 6
 clock_font_color = #ffffff 100
