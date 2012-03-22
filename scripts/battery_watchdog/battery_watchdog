@@ -55,7 +55,7 @@ while :; do
 		elif [ "${battery_percent}" -le '10' ]; then
 			# Hibernate? Poweroff?
 			logger -t 'battery watchdog' "Emergency shutdown, ${battery_percent}% battery left."
-			poweroff
+			hibernate || poweroff
 		elif [ "${battery_percent}" -le '15' ]; then
 			# 15% or less in the battery.
 			# Changing interval to 30s
