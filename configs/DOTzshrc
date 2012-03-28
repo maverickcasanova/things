@@ -286,6 +286,11 @@ if ! [[ "${PATH}" =~ "^${HOME}/bin" ]]; then
 	export PATH="${HOME}/bin:${PATH}"
 fi
 
+# Not all servers have terminfo for rxvt-256color. :<
+if [ "${TERM}" = 'rxvt-256color' ] && ! [ -f '/usr/share/terminfo/r/rxvt-256color' ] && ! [ -f '/lib/terminfo/r/rxvt-256color' ]; then
+	export TERM='rxvt-unicode'
+fi
+
 export EDITOR="/usr/bin/vim"
 export TMP="$HOME/tmp"
 export TEMP="$TMP"
@@ -349,11 +354,5 @@ esac
 
 bindkey "^R" history-incremental-pattern-search-backward 
 bindkey "^S" history-incremental-pattern-search-forward
-
-# Not all servers have terminfo for rxvt-256color. :<
-if [ "${TERM}" = 'rxvt-256color' ] && ! [ -f '/usr/share/terminfo/r/rxvt-256color' ] && ! [ -f '/lib/terminfo/r/rxvt-256color' ]; then
-	export TERM='rxvt-unicode'
-fi
-
 
 if [ -f ~/.alert ]; then cat ~/.alert; fi
