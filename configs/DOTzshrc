@@ -263,7 +263,9 @@ if [ "$USER" = 'root' ] && [ "$(cut -d ' ' -f 19 /proc/$$/stat)" -gt 0 ]; then
 fi
 
 # Fancy prompt.
-if over_ssh; then
+if over_ssh && [ -z "${TMUX}" ]; then
+	prompt_is_ssh='%F{blue}[%F{red}SSH%F{blue}] '
+elif over_ssh; then
 	prompt_is_ssh='%F{blue}[%F{253}SSH%F{blue}] '
 else
 	unset prompt_is_ssh
@@ -279,11 +281,6 @@ case $USER in
 
 	;;
 esac
-
-# Print info if working remotly without tmux.
-if over_ssh && [ -z "${TMUX}" ]; then
-	ewarn "Remember to attach to tmux session."
-fi
 
 # Ignore duplicate in history.
 setopt hist_ignore_dups
