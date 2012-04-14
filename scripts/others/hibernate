@@ -12,6 +12,11 @@ fi
 if which wicd-cli > /dev/null 2>&1; then
 	wicd-cli --wireless --disconnect > /dev/null
 fi
+
+if command -v hdparm > /dev/null 2>&1; then
+	hdparm_sda_apm_value="$(hdparm -B /dev/sda | awk '$1 == "APM_level" && $3 ~ "^[0-9]+$" { print $3; }')"
+fi
+
 amixer -q set Master mute
 
 ### Suspend to disk.
@@ -19,8 +24,15 @@ s2disk
 
 ### After resume.
 if [ -f '/usr/share/wicd/daemon/autoconnect.py' ]; then
+	echo 'Poking wicd to autoconnect.'
 	/usr/share/wicd/daemon/autoconnect.py
 fi
 if which cpufreq-set > /dev/null 2>&1; then
+	echo "Setting cpu governor to '${governor:-ondemand}'."
 	cpufreq-set -r -g "${governor:-ondemand}"
+fi
+
+if [ -n "${hdparm_sda_apm_value}" ] && [[ "${hdparm_sda_apm_value}" =~ ^[0-9]+$ ]]; then
+	echo "Setting back APM level on sda to '${hdparm_sda_apm_value}'."
+	hdparm -B "${hdparm_sda_apm_value}" /dev/sda
 fi
