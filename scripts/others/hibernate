@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Quick and dirty s2disk wrapper.
 
 ### Before suspend
@@ -34,5 +34,5 @@ fi
 
 if [ -n "${hdparm_sda_apm_value}" ] && [[ "${hdparm_sda_apm_value}" =~ ^[0-9]+$ ]]; then
 	echo "Setting back APM level on sda to '${hdparm_sda_apm_value}'."
-	hdparm -B "${hdparm_sda_apm_value}" /dev/sda
+	hdparm -B "${hdparm_sda_apm_value}" /dev/sda > /dev/null 2>&1
 fi
