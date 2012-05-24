@@ -36,6 +36,9 @@ run_under_tmux() {
 	# 	torrent() { run_under_tmux rtorrent /usr/local/rtorrent-git/bin/rtorrent; }
 	#	irc() { run_under_tmux irssi; }
 
+	# There is a bug in linux's libevent...
+	# export EVENT_NOEPOLL=1
+
 	command -v tmux >/dev/null 2>&1 || return 1
 
 	if [ -z "$1" ]; then return 1; fi

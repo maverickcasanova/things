@@ -1,0 +1,23 @@
+#!/bin/sh
+
+readonly scriptpath="$(readlink -f "$0")"
+readonly workdir="${scriptpath%/*}"
+
+update() {
+	if [ -z "$1" ] || [ -z "$2" ]; then return 1; fi
+	if [ -f "$1" ] && [ -r "$1" ] && ! [ -L "$1" ] && ! cmp --silent "$1" "$2"; then
+		echo ">>> Updating '$2' from '$1' ..."
+		cat "$1" > "${workdir}/$2"
+	else
+		return 1
+	fi
+}
+
+update /etc/dnsmasq.conf configs/dnsmasq.conf
+update ~/.zshrc configs/DOTzshrc
+update ~/.Xdefaults  configs/DOTXDefaults
+update ~/.config/tint2/tint2rc configs/tint2rc
+update ~/.asoundrc  configs/DOTasoundrc
+update ~/.tmux.conf  configs/DOTtmux.conf
+
+git status --porcelain
