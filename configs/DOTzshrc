@@ -323,6 +323,13 @@ setopt hist_ignore_space
 #stty -ixon
 setopt noflowcontrol
 
+# Fix for tmux on linux.
+case "$(uname -o)" in
+	'GNU/Linux')
+		export EVENT_NOEPOLL=1
+	;;
+esac
+
 # Shell config.
 umask 077
 if ! [[ "${PATH}" =~ "^${HOME}/bin" ]]; then
