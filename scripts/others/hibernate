@@ -4,17 +4,22 @@
 ### Before suspend
 sync
 # Get current governor, save it and switch to performance.
-if which cpufreq-info > /dev/null 2>&1 && which cpufreq-set > /dev/null 2>&1; then
+if command -v cpufreq-info > /dev/null 2>&1 && command -v  cpufreq-set > /dev/null 2>&1; then
 	governor=$(cpufreq-info -p | cut -d ' ' -f 3)
 	cpufreq-set -r -g performance
 fi
 # Disconnect wifi connectins.
-if which wicd-cli > /dev/null 2>&1; then
+if command -v wicd-cli > /dev/null 2>&1; then
 	wicd-cli --wireless --disconnect > /dev/null
 fi
 
+# Save APM level so we can restore it after resume.
 if command -v hdparm > /dev/null 2>&1; then
-	hdparm_sda_apm_value="$(hdparm -B /dev/sda | awk '$1 == "APM_level" && $3 ~ "^[0-9]+$" { print $3; }')"
+	declare -A hdparm_apms
+	for hd in /dev/sd[a-z] /dev/hd[a-z]; do
+		if [ "${hd}" = '/dev/hd[a-z]' ] || [ "${hd}" = '/dev/sd[a-z]' ]; then continue; fi
+		hdparm_apms[${hd##*/}]="$(hdparm -B "${hd}" | awk '$1 == "APM_level" && $3 ~ "^[0-9]+$" { print $3; }')"
+	done 2>/dev/null; unset hd
 fi
 
 amixer -q set Master mute
@@ -27,12 +32,22 @@ if [ -f '/usr/share/wicd/daemon/autoconnect.py' ]; then
 	echo 'Poking wicd to autoconnect.'
 	/usr/share/wicd/daemon/autoconnect.py
 fi
-if which cpufreq-set > /dev/null 2>&1; then
+if command -v cpufreq-set > /dev/null 2>&1; then
 	echo "Setting cpu governor to '${governor:-ondemand}'."
 	cpufreq-set -r -g "${governor:-ondemand}"
 fi
 
-if [ -n "${hdparm_sda_apm_value}" ] && [[ "${hdparm_sda_apm_value}" =~ ^[0-9]+$ ]]; then
-	echo "Setting back APM level on sda to '${hdparm_sda_apm_value}'."
-	hdparm -B "${hdparm_sda_apm_value}" /dev/sda > /dev/null 2>&1
+if command -v hdparm > /dev/null 2>&1; then
+	for hd in "${!hdparm_apms[@]}"; do
+		echo "Setting back APM level on ${hd} to '${hdparm_apms[${hd}]}'."
+		hdparm -B "${hdparm_apms[${hd}]}" "/dev/${hd}" > /dev/null 2>&1
+	done
+fi
+
+if [ -f "/sys/devices/virtual/dmi/id/product_name" ] && [ "$(< /sys/devices/virtual/dmi/id/product_name)" = '1215N' ]; then
+	if [ -f /proc/acpi/call ] && [ -x /usr/share/acpi_call/asus1215n.sh ]; then
+		/usr/share/acpi_call/asus1215n.sh off >/dev/null
+	else
+		echo "!!! Unable to disable Nvidia GPU."
+	fi
 fi
