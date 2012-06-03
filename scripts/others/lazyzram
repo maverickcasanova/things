@@ -1,0 +1,47 @@
+#!/bin/bash
+
+if ! awk '$1 == "zram" { exit 1 }' /proc/modules; then
+	echo 'Zram is already loaded.'
+	exit 1
+fi
+
+numproc="$(grep -c '^processor' /proc/cpuinfo)"
+if [ "${numproc}" = '0' ]; then
+	numproc=1
+elif [ "${numproc}" -gt '2' ]; then
+	numproc="$((numproc-1))"
+fi
+
+# Take 20% of ram and split it between number of cores (-1 if more than 2 are present).
+
+zram_size_per_device="$(awk -v numproc="${numproc}" '$1 == "MemTotal:" { mem_total = $2; exit } END { mem_for_zram = mem_total/5; printf("%d\n", mem_for_zram/numproc) }' /proc/meminfo)"
+
+printf "Zram devices: %d\n" "${numproc}"
+printf "Size per device: %d MiB\n" "$((zram_size_per_device/1024))"
+
+modprobe zram zram_num_devices="${numproc}" || exit 1
+
+attempts=0
+while true; do 
+	if [ "${attempts}" -ge '5' ]; then
+		echo "Something went wrong, no /dev/zram0 device!"
+		exit 1
+	fi
+
+	if ! [ -b '/dev/zram0' ]; then
+		attempts="$((attempts+1))"
+		echo "Waiting for zram devices..."
+		sleep 1
+	else
+		break
+	fi
+done
+
+numdev=0
+while [ "${numdev}" -lt "${numproc}" ]; do
+	echo "$((zram_size_per_device*1024))" >> "/sys/block/zram${numdev}/disksize"
+	mkswap "/dev/zram${numdev}" >/dev/null || exit 1
+	swapon -p 10 "/dev/zram${numdev}" || exit 1
+	numdev="$((numdev+1))"
+done
+
