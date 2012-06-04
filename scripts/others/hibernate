@@ -19,6 +19,23 @@ if command -v wicd-cli > /dev/null 2>&1; then
 	sleep 1
 fi
 
+# Drop zram devices before we suspend.
+declare -A zram_swaps_prio
+while read -r device _ _ _ prio; do
+	case "${device}" in
+		/dev/zram[0-9]*)
+			einfo "Disabling swap on '${device##*/}' ..."
+			zram_swap='true'
+			zram_swaps_prio[${device}]="${prio}"
+			swapoff "${device}"
+			echo 1 >"/sys/block/${device##*/}/reset"
+		;;
+	esac
+
+	# /proc/swaps change after swapoff so we need to use subshell can cat instead of simple </proc/swaps
+done < <(cat /proc/swaps)
+unset device prio
+
 # Save APM level so we can restore it after resume.
 if command -v hdparm > /dev/null 2>&1; then
 	einfo "Backing up harddisks APM levels ..."
@@ -61,3 +78,12 @@ if [ -f "/sys/devices/virtual/dmi/id/product_name" ] && [ "$(< /sys/devices/virt
 		echo "!!! Unable to disable Nvidia GPU."
 	fi
 fi
+
+if [ "${zram_swap}" = 'true' ]; then
+	for device in "${!zram_swaps_prio[@]}"; do
+		einfo "Enabling swap on '${device##*/}' with '${zram_swaps_prio[${device}]}' priority ..."
+		mkswap "${device}" >/dev/null
+		swapon "${device}" -p "${zram_swaps_prio[${device}]}"
+	done
+fi
+
