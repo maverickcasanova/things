@@ -25,7 +25,8 @@ fi
 amixer -q set Master mute
 
 ### Suspend to disk.
-s2disk
+#s2disk
+echo disk > /sys/power/state
 
 ### After resume.
 if [ -f '/usr/share/wicd/daemon/autoconnect.py' ]; then
