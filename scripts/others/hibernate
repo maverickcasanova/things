@@ -1,20 +1,27 @@
 #!/bin/bash
 # Quick and dirty s2disk wrapper.
 
+einfo() { printf ">>> $@\n"; }
+
 ### Before suspend
 sync
 # Get current governor, save it and switch to performance.
 if command -v cpufreq-info > /dev/null 2>&1 && command -v  cpufreq-set > /dev/null 2>&1; then
+	einfo "Setting CPU Governor to performance ..."
 	governor=$(cpufreq-info -p | cut -d ' ' -f 3)
 	cpufreq-set -r -g performance
 fi
 # Disconnect wifi connectins.
 if command -v wicd-cli > /dev/null 2>&1; then
+	einfo "Disconnecting wifi ..."
 	wicd-cli --wireless --disconnect > /dev/null
+	# Better wait 1s than suspend before wicd is disconnected.
+	sleep 1
 fi
 
 # Save APM level so we can restore it after resume.
 if command -v hdparm > /dev/null 2>&1; then
+	einfo "Backing up harddisks APM levels ..."
 	declare -A hdparm_apms
 	for hd in /dev/sd[a-z] /dev/hd[a-z]; do
 		if [ "${hd}" = '/dev/hd[a-z]' ] || [ "${hd}" = '/dev/sd[a-z]' ]; then continue; fi
@@ -25,27 +32,29 @@ fi
 amixer -q set Master mute
 
 ### Suspend to disk.
+einfo "Suspending to disk ..."
 #s2disk
 echo disk > /sys/power/state
 
 ### After resume.
 if [ -f '/usr/share/wicd/daemon/autoconnect.py' ]; then
-	echo 'Poking wicd to autoconnect.'
+	einfo 'Poking wicd to autoconnect.'
 	/usr/share/wicd/daemon/autoconnect.py
 fi
 if command -v cpufreq-set > /dev/null 2>&1; then
-	echo "Setting cpu governor to '${governor:-ondemand}'."
+	einfo "Setting CPU Governor to ${governor:-ondemand} ..."
 	cpufreq-set -r -g "${governor:-ondemand}"
 fi
 
 if command -v hdparm > /dev/null 2>&1; then
 	for hd in "${!hdparm_apms[@]}"; do
-		echo "Setting back APM level on ${hd} to '${hdparm_apms[${hd}]}'."
+		einfo "Setting back APM level on ${hd} to '${hdparm_apms[${hd}]}'."
 		hdparm -B "${hdparm_apms[${hd}]}" "/dev/${hd}" > /dev/null 2>&1
 	done
 fi
 
 if [ -f "/sys/devices/virtual/dmi/id/product_name" ] && [ "$(< /sys/devices/virtual/dmi/id/product_name)" = '1215N' ]; then
+	einfo "Disabling Nvidia GPU ..."
 	if [ -f /proc/acpi/call ] && [ -x /usr/share/acpi_call/asus1215n.sh ]; then
 		/usr/share/acpi_call/asus1215n.sh off >/dev/null
 	else
