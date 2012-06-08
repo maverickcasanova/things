@@ -79,6 +79,10 @@ if [ -f "/sys/devices/virtual/dmi/id/product_name" ] && [ "$(< /sys/devices/virt
 	fi
 fi
 
+if command -v le_power >/dev/null 2>&1; then
+	le_power auto
+fi
+
 if [ "${zram_swap}" = 'true' ]; then
 	for device in "${!zram_swaps_prio[@]}"; do
 		einfo "Enabling swap on '${device##*/}' with '${zram_swaps_prio[${device}]}' priority ..."
