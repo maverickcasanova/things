@@ -1,12 +1,14 @@
 #!/bin/dash
 # Volume control.
 
+step='3'
+
 up() {
-	amixer -q set Master 2+ unmute
+	amixer -q set Master ${step}+ unmute
 }
 
 down() {
-	amixer -q set Master 2- unmute
+	amixer -q set Master ${step}- unmute
 }
 
 mute() {

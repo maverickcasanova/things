@@ -23,19 +23,24 @@ modprobe zram zram_num_devices="${numproc}" || exit 1
 
 attempts=0
 while true; do 
-	if [ "${attempts}" -ge '5' ]; then
+	if [ "${attempts}" -ge '30' ]; then
 		echo "Something went wrong, no /dev/zram0 device!"
 		exit 1
 	fi
 
 	if ! [ -b '/dev/zram0' ]; then
+		if [ "${attempts}" = '0' ]; then
+			printf "%s" "Waiting for zram devices...";
+		else
+			printf "."
+		fi
 		attempts="$((attempts+1))"
-		echo "Waiting for zram devices..."
 		sleep 1
 	else
 		break
 	fi
 done
+if [ "${attempts}" -gt '0' ]; then printf '\n'; fi
 
 numdev=0
 while [ "${numdev}" -lt "${numproc}" ]; do

@@ -1,6 +1,3 @@
-# example usage in mplayer:
-#	mplayer -ao alsa:device=51to20 movie-with-6-channel-sound.mkv
-
 pcm.51to20 {
    type route
    slave.pcm default
@@ -18,4 +15,16 @@ pcm.51to20 {
 ctl.51to20 {
    type hw
    card 0
+}
+
+pcm.louder {
+	type plug
+	slave.pcm "dmix'
+	ttable.0.0 1.5
+	ttable.1.1 1.5
+}
+
+pcm.!default  {
+	type plug
+	slave.pcm "louder"
 }
