@@ -53,9 +53,9 @@ run_under_tmux() {
 	fi
 
 	if tmux has-session -t "${name}" 2>/dev/null; then
-	        tmux attach -d -t "${name}"
+		tmux attach -d -t "${name}"
 	else
-	        tmux new-session -s "${name}" "${file_path}" \; set-option status \; set set-titles-string "${name} [tmux]"
+		tmux new-session -s "${name}" "${file_path}" \; set-option status \; set set-titles-string "${name} [tmux]"
 	fi
 }
 
