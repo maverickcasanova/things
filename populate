@@ -17,7 +17,7 @@ update /etc/dnsmasq.conf configs/dnsmasq.conf
 update ~/.zshrc configs/DOTzshrc
 update ~/.Xdefaults  configs/DOTXDefaults
 update ~/.config/tint2/tint2rc configs/tint2rc
-update ~/.asoundrc  configs/DOTasoundrc
 update ~/.tmux.conf  configs/DOTtmux.conf
+update ~/.vimrc configs/DOTvimrc
 
 git status --porcelain

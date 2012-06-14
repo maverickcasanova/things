@@ -1,0 +1,38 @@
+map <F2> :set nu!<CR>
+imap <F2> <C-O>:set nu!<CR>
+map <F3> :nohl<CR>
+imap <F3> <C-O>:nohl<CR>
+set pastetoggle=<F4>
+
+"Ignore case in searches
+set ignorecase
+
+colorscheme ron
+set autoindent
+
+" Treat .inc files as .php.
+au BufReadPost *.inc set syntax=php
+
+" Comment or uncomment current/selected lines.
+map <silent> C :s/^/#/<CR>:nohlsearch<CR>
+map <silent> U :s/^#/<CR>:nohlsearch<CR>
+" Trim all tralling whitespaces
+map <silent> W :s/^\s\+//e<CR>:nohlsearch<CR>
+" Trim all tralling spaces (not tabs).
+map <silent> S :s/^ \+//e<CR>:nohlsearch<CR>
+" Append tab to the begin of each selected line, useful when wrapping blocks of code.
+map <silent> T :s/^/\t/<CR>:nohlsearch<CR>
+
+" 4 spaces tabs.
+set tabstop=4
+
+set nocompatible
+set bs=2
+
+" When editing a file, always jump to the last cursor position
+autocmd BufReadPost *
+	\ if ! exists("g:leave_my_cursor_position_alone") |
+	\     if line("'\"") > 0 && line ("'\"") <= line("$") |
+	\         exe "normal g'\"" |
+	\     endif |
+	\ endif
