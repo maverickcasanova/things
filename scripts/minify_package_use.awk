@@ -6,9 +6,11 @@
 # Usage: awk -f minify_package_use.awk /etc/portage/package.use > /etc/portage/new_package.use
 # Check new_package.use and replace old package.use with new_package.use.
 
-$1 !~ "^($|([ \t]+|)#)" {
-	target = $1
-	flags = substr($0, index($0,$2))
+$1 !~ "^(([ \t]+#|#)|$)" {
+	target = $1; $1 = ""
+	flags = $0
+	sub(/^[ \t]+/, "", flags);
+	#flags = substr($0, index($0,$2))
 	if (package_use_flags[target]) {
 		package_use_flags[target] = flags " " package_use_flags[target]
 	} else {
