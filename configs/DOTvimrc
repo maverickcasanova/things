@@ -7,6 +7,7 @@ set pastetoggle=<F4>
 "Ignore case in searches
 set ignorecase
 
+syntax on
 colorscheme ron
 set autoindent
 
