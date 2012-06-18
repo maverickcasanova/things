@@ -146,16 +146,10 @@ termtitle() {
 				;;
 				preexec)
 					zsh_cmd_title="$2"
-					# Escape '\' char.
-					zsh_cmd_title="${zsh_cmd_title//\\/\\\\}"
-					# Escape '$' char.
-					zsh_cmd_title="${zsh_cmd_title//\$/\\\\\$}"
-					# Escape '%' char.
-					#zsh_cmd_title="${zsh_cmd_title//%/\%\%}"
-					# As I am unable to deal with all %, especialy
-					# the nasted one, I will just strip this char.
-					zsh_cmd_title="${zsh_cmd_title//\%/<percent>}"
-					print -Pn "\e]0;${zsh_cmd_title} [%n@%m: %~]\a"
+					local prompt_host="${(%):-%m}"
+					local prompt_user="${(%):-%n}"
+					local prompt_char="${(%):-%~}"
+					printf "\e]0;%s %s\a" "${zsh_cmd_title}" "[${prompt_user}@${prompt_host}: ${prompt_char}]"
 				;;
 			esac
 		;;
