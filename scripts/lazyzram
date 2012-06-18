@@ -19,7 +19,7 @@ zram_size_per_device="$(awk -v numproc="${numproc}" '$1 == "MemTotal:" { mem_tot
 printf "Zram devices: %d\n" "${numproc}"
 printf "Size per device: %d MiB\n" "$((zram_size_per_device/1024))"
 
-modprobe zram zram_num_devices="${numproc}" || exit 1
+modprobe zram num_devices="${numproc}" || exit 1
 
 attempts=0
 while true; do 
