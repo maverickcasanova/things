@@ -238,6 +238,14 @@ chpwd() {
 	git_check_if_worktree
 }
 
+man() {
+	if command -v vimmanpager >/dev/null 2>&1; then
+		PAGER="vimmanpager" command man "$@"
+	else
+		command man "$@"
+	fi
+}
+
 # Are we running under grsecurity's RBAC?
 rbac_auth() {
 	local auth_to_role='admin'
