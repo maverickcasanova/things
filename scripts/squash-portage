@@ -18,8 +18,22 @@ new_squash() {
 prepare_env() {
 	# Test if there is support for loop mounts.
 	if ! [ -c /dev/loop-control ]; then
-		modprobe loop 2>/dev/null || die "Your kernel does not support loop devices. :<"
-		sleep 1
+		if modprobe loop 2>/dev/null; then
+			attempts=0
+			while true; do
+				if [ "${attempts}" -ge '10' ]; then
+					die "Something went wrong, /dev/loop-control were not created!"
+				fi
+				if ! [ -c /dev/loop-control ]; then
+					attempts="$((attempts+1))"
+					sleep 1
+				else
+					break
+				fi
+			done
+		else
+			die "Your kernel does not support loop devices. :<"
+		fi
 	fi
 	if awk '$1 == "aufs" || $2 == "aufs" { exit 1 };' /proc/filesystems; then
 		die "Your kernel does not support aufs!"
