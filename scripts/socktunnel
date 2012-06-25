@@ -1,0 +1,48 @@
+#!/bin/bash
+# Use socat (need on local and remote end) and forward via ssh unix socket to local socket or port.
+# Example:
+#	socktunnel kvmuser123@herp.derp.com /home/kvmuser123/vnc/vm123.vnc.socket vm123.vnc.socket -- -p 1022 -C
+#	socktunnel foo@herp.derp.com /var/run/mysql.sock :3306 -- -C
+# First example will forward remote's /home/kvmuser123/vnc/vm123.vnc.socket to local vm123.vnc.socket via ssh kvmuser123@herp.derp.com
+# running on port 1022 with compression enabled. Now you can connect to it via for example ssvncviewer, like:
+# 'ssvncviewer ./vm123.vnc.socket'
+
+if [ "$#" -lt 3 ]; then exit 1; fi
+
+target_argv="$1"
+from_argv="$2"
+to_argv="$3"
+
+while [ "$#" -ge '1' ]; do
+	case "$1" in
+		'--')
+			shift
+			ssh_extra_args="$@"
+		;;
+		*)
+			shift
+		;;
+	esac
+done
+
+if [[ "${from_argv}" =~ ^: ]]; then
+	from="TCP-CONNECT:${from_argv#:}"
+else
+	from="UNIX-CONNECT:${from_argv}"
+fi
+
+if [[ "${to_argv}" =~ ^: ]]; then
+	to="TCP-LISTEN:${to_argv#:}"
+else
+	local_socket_path="${to_argv}"
+	to="UNIX-LISTEN:${local_socket_path}"
+	if [ -e "${local_socket_path}" ]; then
+		echo "Socket '${local_socket_path}' already exist."
+		exit 1
+	fi
+fi
+
+# Sometimes socat may not remove socket.
+trap 'rm "${local_socket_path}" 2>/dev/null' INT EXIT TERM
+
+socat "${to}",fork EXEC:"ssh ${target_argv} ${ssh_extra_args} 'socat STDIO ${from}'"
