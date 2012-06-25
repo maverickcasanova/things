@@ -43,6 +43,6 @@ else
 fi
 
 # Sometimes socat may not remove socket.
-trap 'rm "${local_socket_path}" 2>/dev/null' INT EXIT TERM
+trap 'if [ -n "${local_socket_path}" ]; then rm "${local_socket_path}" 2>/dev/null; fi' INT EXIT TERM
 
 socat "${to}",fork EXEC:"ssh ${target_argv} ${ssh_extra_args} 'socat STDIO ${from}'"
