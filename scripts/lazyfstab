@@ -1,0 +1,80 @@
+#!/bin/bash
+# Lazyfstab 0.1
+# Generate fstab using mounted filesystem list from /proc/mounts.
+# Intend to speedup a bit gentoo's chroot installation.
+#
+# Copyright (c) 2011, Piotr Karbowski <piotr.karbowski@gmail.com>
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without modification, are
+# permitted provided that the following conditions are met:
+#
+# * Redistributions of source code must retain the above copyright notice, this
+#   list of conditions and the following disclaimer.
+# * Redistributions in binary form must reproduce the above copyright notice, this
+#   list of conditions and the following disclaimer in the documentation and/or other
+#   materials provided with the distribution.
+# * Neither the name of the Piotr Karbowski nor the names of its contributors may be
+#   used to endorse or promote products derived from this software without specific
+#   prior written permission.
+
+set -e
+unset mountpoints mountpoint devicepath fstype fsflags fsdump fsfsck
+
+inarray() {
+	local string="${1}"; shift
+	local arrayelement
+	for arrayelement in "$@"; do
+		if [ "${string}" = "${arrayelement}" ]; then
+			return 0
+		fi
+	done
+	return 1
+}
+declare -a mountpoints
+
+genfstab() {
+	while read devicepath mountpoint fstype fsflags fsdump fsfsck; do
+
+		# Skip entry if we already have device for this mountpoint.
+		# That should provide us the latest (top) filesystem on mountpoint.
+		if inarray "${mountpoint}" "${mountpoints[@]}"; then continue; fi
+
+		case "${mountpoint}" in
+			'/')
+				echo -e "${devicepath}\t${mountpoint}\t${fstype}\trelatime\t0 1"
+			;;
+			'/boot'|'/home')
+				echo -e "${devicepath}\t${mountpoint}\t${fstype}\trelatime,nosuid,nodev\t0 1"
+			;;
+			'/tmp')
+				echo -e "${devicepath}\t${mountpoint}\t${fstype}\trelatime,nosuid,nodev,noexec\t0 2"
+			;;
+			'/var/tmp')
+				echo -e "${devicepath}\t${mountpoint}\t${fstype}\trelatime,nosuid,nodev,noexec\t0 2"
+			;;
+			'/media/'*)
+				# We don't really want include anything for /media in fstab.
+				continue
+			;;
+			*)
+				echo -e "${devicepath}\t${mountpoint}\t${fstype}\t${fsflags}\t${fsdump}\t${fsfsck}"
+			;;
+		esac
+		mountpoints+=( "${mountpoint}" )
+	done < <(tac '/proc/mounts' | grep '^/dev/')
+
+		# Add tmpfs as /tmp if there is no /tmp mounted.
+		if ! inarray '/tmp' "${mountpoints[@]}"; then 
+			echo "tmp-tmpfs /tmp tmpfs size=128M.mode=1777,nosuid,nodev,noexec 0 0"
+		fi
+}
+
+case "$1" in
+	-t|--table)
+		genfstab | sort -k '2,2' | column -t 
+	;;
+	*)
+		genfstab | sort -k '2,2'
+	;;
+esac
