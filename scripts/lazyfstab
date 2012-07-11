@@ -66,7 +66,7 @@ genfstab() {
 
 		# Add tmpfs as /tmp if there is no /tmp mounted.
 		if ! inarray '/tmp' "${mountpoints[@]}"; then 
-			echo "tmp-tmpfs /tmp tmpfs size=128M.mode=1777,nosuid,nodev,noexec 0 0"
+			echo "tmp-tmpfs /tmp tmpfs size=128M,mode=1777,nosuid,nodev,noexec 0 0"
 		fi
 }
 
