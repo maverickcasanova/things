@@ -3,11 +3,28 @@
 # License: beerware.
 
 # Basic zsh config.
+umask 077
 ZDOTDIR=${ZDOTDIR:-${HOME}}
 ZSHDDIR="${HOME}/.config/zsh.d"
 HISTFILE="${ZDOTDIR}/.zsh_history"
 HISTSIZE='10000'
 SAVEHIST="${HISTSIZE}"
+export EDITOR="/usr/bin/vim"
+export TMP="$HOME/tmp"
+export TEMP="$TMP"
+export TMPDIR="$TMP"
+export TMPPREFIX="${TMPDIR}/zsh"
+
+if [ ! -d "${TMP}" ]; then mkdir "${TMP}"; fi
+
+if ! [[ "${PATH}" =~ "^${HOME}/bin" ]]; then
+	export PATH="${HOME}/bin:${PATH}"
+fi
+
+# Not all servers have terminfo for rxvt-256color. :<
+if [ "${TERM}" = 'rxvt-256color' ] && ! [ -f '/usr/share/terminfo/r/rxvt-256color' ] && ! [ -f '/lib/terminfo/r/rxvt-256color' ] && ! [ -f "${HOME}/.terminfo/r/rxvt-256color" ]; then
+	export TERM='rxvt-unicode'
+fi
 
 # Colors.
 red='\e[0;31m'
@@ -282,6 +299,11 @@ autoload -U zargs
 # Turn on command substitution in the prompt (and parameter expansion and arithmetic expansion).
 setopt promptsubst
 
+# Control-x-e to open current line in $EDITOR, awesome when writting functions or editing multiline commands.
+autoload -U edit-command-line
+zle -N edit-command-line
+bindkey '^x^e' edit-command-line
+
 # Include user-specified configs.
 if [ ! -d "${ZSHDDIR}" ]; then
 	mkdir -p "${ZSHDDIR}" && echo "# Put your user-specified config here." > "${ZSHDDIR}/example.zsh"
@@ -343,24 +365,7 @@ case "$(uname -o)" in
 	;;
 esac
 
-# Shell config.
-umask 077
-if ! [[ "${PATH}" =~ "^${HOME}/bin" ]]; then
-	export PATH="${HOME}/bin:${PATH}"
-fi
-
-# Not all servers have terminfo for rxvt-256color. :<
-if [ "${TERM}" = 'rxvt-256color' ] && ! [ -f '/usr/share/terminfo/r/rxvt-256color' ] && ! [ -f '/lib/terminfo/r/rxvt-256color' ] && ! [ -f "${HOME}/.terminfo/r/rxvt-256color" ]; then
-	export TERM='rxvt-unicode'
-fi
-
-export EDITOR="/usr/bin/vim"
-export TMP="$HOME/tmp"
-export TEMP="$TMP"
-export TMPDIR="$TMP"
-
-if [ ! -d "${TMP}" ]; then mkdir "${TMP}"; fi
-
+# Aliases
 alias cp='cp -iv'
 alias rcp='rsync -v --progress'
 alias rmv='rsync -v --progress --remove-source-files'
