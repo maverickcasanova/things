@@ -1,0 +1,86 @@
+#!/bin/sh
+
+umask 077
+
+# Awk of choice.
+awk='mawk'
+
+get_devices() {
+	if [ -f "${HOME}/.acpistat.cache" ]; then
+		. "${HOME}/.acpistat.cache"
+	else
+		for i in /sys/class/power_supply/*; do
+			[ -f "${i}/type" ] && dev_type="$(cat "${i}/type")"
+		
+			[ -n "${dev_type}" ] || return
+			if [ "${dev_type}" = 'Mains' ]; then
+				ac_adapter="${i}"
+			elif [ "${dev_type}" = 'Battery' ]; then
+				battery="${i}"
+			fi
+		done
+		printf 'ac_adapter="%s"\nbattery="%s"\n' "${ac_adapter}" "${battery}" >"${HOME}/.acpistat.cache"
+	fi
+}
+
+ac_stat() {
+	if [ -z "${ac_adapter}" ]; then
+		echo "No AC found" >&2
+		return 1
+	fi
+
+	ac_status="$(cat "${ac_adapter}/online")"
+	case "${ac_status}" in
+		1)
+			ac_status_string='on-line'
+		;;
+		0)
+			ac_status_string='off-line'
+		;;
+	esac
+}
+
+battery_stat() {
+	if [ -z "${battery}" ]; then
+		echo "No batter found" >&2
+		return 1
+	fi
+
+	battery_status="$(cat ${battery}/status)"
+	battery_remaining="$(cat ${battery}/charge_now)"
+	battery_total="$(cat ${battery}/charge_full)"
+	battery_usage_now="$(cat ${battery}/current_now)"
+	battery_percent="$((battery_remaining*100/battery_total))"
+	[ "${battery_percent}" -gt '100' ] && battery_percent="100"
+
+	if [ "${ac_status}" = '0' ]; then
+		battery_remaining_time="$(
+		${awk} -v charge_now="${battery_remaining}" -v current_now="${battery_usage_now}" \
+		'
+		function hms(s) {
+			h=int(s/3600);
+			s=s-(h*3600);
+			m=int(s/60);
+			s=s-(m*60);
+			output = sprintf("%d:%02d:%02d", h, m, s);
+			return(output)
+		}	
+		BEGIN {
+			print hms(3600*(charge_now/current_now))
+		}
+		'
+		)"
+	fi
+
+}
+
+get_devices
+ac_stat
+battery_stat
+
+if [ "${ac_status}" = '0' ]; then
+	echo "${1}AC ${ac_status_string}, ${battery_status}, ${battery_percent}%, ${battery_remaining_time}"
+else
+	echo "${1}AC ${ac_status_string}, ${battery_status}, ${battery_percent}%"
+fi
+
