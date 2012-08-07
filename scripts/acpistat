@@ -6,8 +6,9 @@ umask 077
 awk='mawk'
 
 get_devices() {
-	if [ -f "${HOME}/.acpistat.cache" ]; then
-		. "${HOME}/.acpistat.cache"
+	acpistat_cache="${HOME}/tmp/acpistat.cache"
+	if [ -f "${acpistat_cache}" ]; then
+		. "${acpistat_cache}"
 	else
 		for i in /sys/class/power_supply/*; do
 			[ -f "${i}/type" ] && dev_type="$(cat "${i}/type")"
@@ -19,7 +20,7 @@ get_devices() {
 				battery="${i}"
 			fi
 		done
-		printf 'ac_adapter="%s"\nbattery="%s"\n' "${ac_adapter}" "${battery}" >"${HOME}/.acpistat.cache"
+		printf 'ac_adapter="%s"\nbattery="%s"\n' "${ac_adapter}" "${battery}" >"${acpistat_cache}"
 	fi
 }
 
