@@ -19,5 +19,6 @@ update ~/.Xdefaults  configs/DOTXDefaults
 update ~/.config/tint2/tint2rc configs/tint2rc
 update ~/.tmux.conf  configs/DOTtmux.conf
 update ~/.vimrc configs/DOTvimrc
+update ~/.gitconfig configs/DOTgitconfig && sed -r 's#(name|email) =.*#\1 = NULL#g;' -i configs/DOTgitconfig
 
 git status --porcelain
