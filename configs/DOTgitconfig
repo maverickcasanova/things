@@ -1,0 +1,10 @@
+[user]
+	name = NULL
+	email = NULL
+[color]
+	ui = auto
+[log]
+	date = iso
+[alias]
+	cv = commit --verbose
+	cva = commit --verbose --all
