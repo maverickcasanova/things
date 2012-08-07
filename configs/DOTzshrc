@@ -348,6 +348,9 @@ case $USER in
 	;;
 esac
 
+# Ignore lines prefixed with '#'.
+setopt interactivecomments
+
 # Ignore duplicate in history.
 setopt hist_ignore_dups
 
