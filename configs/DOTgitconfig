@@ -6,5 +6,6 @@
 [log]
 	date = iso
 [alias]
-	cv = commit --verbose
-	cva = commit --verbose --all
+	c = commit --verbose
+	ca = commit --verbose --all
+	s = status --short
