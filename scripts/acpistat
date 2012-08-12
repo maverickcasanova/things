@@ -82,6 +82,10 @@ battery_stat
 if [ "${ac_status}" = '0' ]; then
 	echo "${1}AC ${ac_status_string}, ${battery_status}, ${battery_percent}%, ${battery_remaining_time}"
 else
+	# Lets assume that battery is charged, the old /proc/acpi/battery interface says charged when the new /sys interface says Unknown.
+	if [ "${battery_status}" = 'Unknown' ] && [ "${battery_remaining}" -ge "${battery_total}" ]; then
+		battery_status='Full'
+	fi
 	echo "${1}AC ${ac_status_string}, ${battery_status}, ${battery_percent}%"
 fi
 
