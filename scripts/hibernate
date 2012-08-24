@@ -15,8 +15,13 @@ fi
 if command -v wicd-cli > /dev/null 2>&1; then
 	einfo "Disconnecting wifi ..."
 	wicd-cli --wireless --disconnect > /dev/null
-	# Better wait 1s than suspend before wicd is disconnected.
-	sleep 1
+	while true; do
+		if ! wicd-cli --wireless --network-details >/dev/null 2>&1; then
+			break
+		else
+			sleep 1
+		fi
+	done
 fi
 
 # Drop zram devices before we suspend.
@@ -56,6 +61,7 @@ echo disk > /sys/power/state
 ### After resume.
 if [ -f '/usr/share/wicd/daemon/autoconnect.py' ]; then
 	einfo 'Poking wicd to autoconnect.'
+	command -v wicd-cli >/dev/null 2>&1 && wicd-cli --wireless --scan
 	/usr/share/wicd/daemon/autoconnect.py
 fi
 if command -v cpufreq-set > /dev/null 2>&1; then
