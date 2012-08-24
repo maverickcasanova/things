@@ -86,9 +86,9 @@ else
 	if [ "${battery_status}" = 'Unknown' ]; then
 		if [ "${battery_remaining}" -ge "${battery_total}" ] || [ "${battery_usage_now}" = 0 ]; then
 			battery_status='Charged'
-		elif [ "${battery_status}" = 'Full' ]; then
-			battery_status='Charged'
 		fi
+	elif [ "${battery_status}" = 'Full' ]; then
+			battery_status='Charged'
 	fi
 	echo "${1}AC ${ac_status_string}, ${battery_status}, ${battery_percent}%"
 fi
