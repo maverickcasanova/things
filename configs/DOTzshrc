@@ -157,23 +157,20 @@ begin_with() {
 termtitle() {
 	case "$TERM" in
 		rxvt*|xterm|nxterm|gnome|screen|screen-*)
+			local prompt_host="${(%):-%m}"
+			local prompt_user="${(%):-%n}"
+			local prompt_char="${(%):-%~}"
 			case "$1" in
 				precmd)
-					print -Pn "\e]0;%n@%m: %~\a"
+					printf '\e]0;%s@%s: %s\a' "${prompt_user}" "${prompt_host}" "${prompt_char}"
 				;;
 				preexec)
-					zsh_cmd_title="$2"
-					local prompt_host="${(%):-%m}"
-					local prompt_user="${(%):-%n}"
-					local prompt_char="${(%):-%~}"
-					printf "\e]0;%s %s\a" "${zsh_cmd_title}" "[${prompt_user}@${prompt_host}: ${prompt_char}]"
+					printf '\e]0;%s [%s@%s: %s]\a' "$2" "${prompt_user}" "${prompt_host}" "${prompt_char}"
 				;;
 			esac
 		;;
 	esac
 }
-
-
 
 git_check_if_worktree() {
 	# This function intend to be only executed in chpwd().
