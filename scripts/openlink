@@ -1,0 +1,18 @@
+#!/bin/bash
+
+browser='defaultbrowser'
+#browser='firefox'
+
+command -v xsel >/dev/null 2>&1 || exit 1
+
+string="$(xsel -p -o)"
+
+case "${string}" in
+	http://*|https://*)
+		${browser} "${string}"
+	;;
+	*)
+		string="${string//&/%26}"
+		${browser} "https://encrypted.google.com/search?hl=pl&q=${string}"
+	;;
+esac
