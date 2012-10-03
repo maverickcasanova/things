@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 browser='defaultbrowser'
 #browser='firefox'
@@ -7,12 +7,17 @@ command -v xsel >/dev/null 2>&1 || exit 1
 
 string="$(xsel -p -o)"
 
+# Remove leading and on the end of script spaces.
+# Replace & with its html code.
+string="$(echo ${string} | sed 's#^ *##g; s# *$##g; s#&#%26#g')"
+
+[ "${string}" ] || exit 1
+
 case "${string}" in
 	http://*|https://*)
 		${browser} "${string}"
 	;;
 	*)
-		string="${string//&/%26}"
 		${browser} "https://encrypted.google.com/search?hl=pl&q=${string}"
 	;;
 esac
