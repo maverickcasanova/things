@@ -37,3 +37,5 @@ autocmd BufReadPost *
 	\         exe "normal g'\"" |
 	\     endif |
 	\ endif
+
+set viminfo=\'100,\"1000,:100
