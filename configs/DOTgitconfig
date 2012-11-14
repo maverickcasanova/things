@@ -9,3 +9,5 @@
 	c = commit --verbose
 	ca = commit --verbose --all
 	s = status --short
+[push]
+	default = simple
