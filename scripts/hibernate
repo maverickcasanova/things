@@ -53,6 +53,12 @@ fi
 
 amixer -q set Master mute
 
+
+# Drop disk caches if there is more than 1GiB of them, we don't really want to waste time writtin all the caches to disk.
+if ! awk '$1 ~ /^(Cached|Buffers):$/ { cachebuffers += $2 }; END { if (int(cachebuffers/1024) > 1024) exit 1 }' /proc/meminfo; then 
+	echo 1 >/proc/sys/vm/drop_caches
+fi
+
 ### Suspend to disk.
 einfo "Suspending to disk ..."
 #s2disk
@@ -62,7 +68,7 @@ echo disk > /sys/power/state
 if [ -f '/usr/share/wicd/daemon/autoconnect.py' ]; then
 	einfo 'Poking wicd to autoconnect.'
 	command -v wicd-cli >/dev/null 2>&1 && wicd-cli --wireless --scan
-	/usr/share/wicd/daemon/autoconnect.py
+	python2 /usr/share/wicd/daemon/autoconnect.py
 fi
 if command -v cpufreq-set > /dev/null 2>&1; then
 	einfo "Setting CPU Governor to ${governor:-ondemand} ..."
