@@ -1,13 +1,17 @@
-#!/bin/sh
-# Toggle touchpad.
-
-status="$(synclient -l | mawk '$1 == "TouchpadOff" { print $3 }')"
-
-if [ "$status" = "1" ]; then
-	synclient TouchpadOff=0
-elif [ "$status" = "0" ]; then
-	synclient TouchpadOff=1
-else
-	echo "The fuck is this? Status = '${status}'".
-	exit 1
-fi
+#!/usr/bin/awk -f
+BEGIN {
+	cmd = "synclient -l"
+	while ( cmd | getline > 0 ) {
+		if ($1 == "TouchpadOff") {
+			if ($3 == "1" ) {
+				system("synclient TouchpadOff=0")
+			} else if ($3 == "0") {
+				system("synclient TouchpadOff=1")
+			} else {
+				exit 1
+			}
+			exit
+		}
+	}
+	close(cmd)
+}
