@@ -24,6 +24,11 @@ if command -v wicd-cli > /dev/null 2>&1; then
 	done
 fi
 
+if pidof dhcpcd >/dev/null; then
+	einfo "Closing dhcpcd process."
+	pkill dhcpcd
+fi
+
 # Drop zram devices before we suspend.
 declare -A zram_swaps_prio
 while read -r device _ _ _ prio; do
