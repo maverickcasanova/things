@@ -17,7 +17,7 @@ case "${string}" in
 		${browser} "${string}"
 	;;
 	*)
-		string="$(echo ${string} | sed 's# *$##g; s#&#%26#g')"
+		string="$(echo ${string} | sed 's# *$##g; s#&#%26#g; s^#^%23^g')"
 		${browser} "https://encrypted.google.com/search?hl=pl&q=${string}"
 	;;
 esac
