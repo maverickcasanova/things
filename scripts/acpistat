@@ -5,91 +5,43 @@ umask 077
 # Awk of choice.
 awk='mawk'
 
-get_devices() {
-	acpistat_cache="${HOME}/tmp/acpistat.cache"
-	if [ -f "${acpistat_cache}" ]; then
-		. "${acpistat_cache}"
-	else
-		for i in /sys/class/power_supply/*; do
-			[ -f "${i}/type" ] && dev_type="$(cat "${i}/type")"
-		
-			[ -n "${dev_type}" ] || return
-			if [ "${dev_type}" = 'Mains' ]; then
-				ac_adapter="${i}"
-			elif [ "${dev_type}" = 'Battery' ]; then
-				battery="${i}"
-			fi
-		done
-		printf 'ac_adapter="%s"\nbattery="%s"\n' "${ac_adapter}" "${battery}" >"${acpistat_cache}"
-	fi
-}
-
-ac_stat() {
-	if [ -z "${ac_adapter}" ]; then
-		echo "No AC found" >&2
-		return 1
-	fi
-
-	ac_status="$(cat "${ac_adapter}/online")"
-	case "${ac_status}" in
-		1)
-			ac_status_string='on-line'
-		;;
-		0)
-			ac_status_string='off-line'
-		;;
-	esac
-}
-
-battery_stat() {
-	if [ -z "${battery}" ]; then
-		echo "No batter found" >&2
-		return 1
-	fi
-
-	battery_status="$(cat ${battery}/status)"
-	battery_remaining="$(cat ${battery}/charge_now)"
-	battery_total="$(cat ${battery}/charge_full)"
-	battery_usage_now="$(cat ${battery}/current_now)"
-	battery_percent="$((battery_remaining*100/battery_total))"
-	[ "${battery_percent}" -gt '100' ] && battery_percent="100"
-
-	if [ "${ac_status}" = '0' ]; then
-		battery_remaining_time="$(
-		${awk} -v charge_now="${battery_remaining}" -v current_now="${battery_usage_now}" \
-		'
-		function hms(s) {
-			h=int(s/3600);
-			s=s-(h*3600);
-			m=int(s/60);
-			s=s-(m*60);
-			output = sprintf("%d:%02d:%02d", h, m, s);
-			return(output)
-		}	
-		BEGIN {
-			print hms(3600*(charge_now/current_now))
-		}
-		'
-		)"
-	fi
-
-}
-
-get_devices
-ac_stat
-battery_stat
-
-if [ "${ac_status}" = '0' ]; then
-	echo "${1}AC ${ac_status_string}, ${battery_status}, ${battery_percent}%, ${battery_remaining_time}"
+acpistat_cache="${HOME}/tmp/acpistat.cache"
+if [ -f "${acpistat_cache}" ]; then
+	. "${acpistat_cache}"
 else
-	# Lets assume that battery is charged, the old /proc/acpi/battery interface says charged when the new /sys interface says Unknown.
-	if [ "${battery_status}" = 'Unknown' ]; then
-		if [ "${battery_remaining}" -ge "${battery_total}" ] || [ "${battery_usage_now}" = 0 ]; then
-			battery_status='Charged'
+	for i in /sys/class/power_supply/*; do
+		[ -f "${i}/type" ] && dev_type="$(cat "${i}/type")"
+		[ -n "${dev_type}" ] || return
+		if [ "${dev_type}" = 'Mains' ]; then
+			ac_adapter_dir="${i}"
+		elif [ "${dev_type}" = 'Battery' ]; then
+			battery_dir="${i}"
 		fi
-	elif [ "${battery_status}" = 'Full' ]; then
-			battery_status='Charged'
-	fi
-	echo "${1}AC ${ac_status_string}, ${battery_status}, ${battery_percent}%"
+	done
+	printf 'ac_adapter_dir="%s"\nbattery_dir="%s"\n' "${ac_adapter_dir}" "${battery_dir}" >"${acpistat_cache}"
 fi
 
+${awk} -v battery_dir="${battery_dir}" -v ac_adapter_dir="${ac_adapter_dir}"  -f - <<-'_awk_code'
+function hms(s) {
+	h=int(s/3600);
+	s=s-(h*3600);
+	m=int(s/60);
+	s=s-(m*60);
+	output = sprintf("%d:%02d:%02d", h, m, s);
+	return(output)
+}
+BEGIN {
+	getline ac_status < ( ac_adapter_dir "/online" )
+	getline battery_status < ( battery_dir "/status" )
+	getline battery_remaining < ( battery_dir "/charge_now" )
+	getline battery_total < ( battery_dir "/charge_full" )
+	getline battery_usage_now < ( battery_dir "/current_now" )
+	battery_percent = int((battery_remaining*100)/(battery_total))
+	if (battery_percent > 100) battery_percent = 100
+	if (ac_status == 0) {
+		print "AC " ( (ac_status == 1) ? "on-line" : "off-line" ) ", " battery_status ", " battery_percent "%, " hms(3600*(battery_remaining/battery_usage_now))
+	} else {
+		print "AC " ( (ac_status == 1) ? "on-line" : "off-line" ) ", " ( (battery_status == "Full") ? "Charged" : battery_status ) ", " battery_percent "%"
+	}
+}
+_awk_code
