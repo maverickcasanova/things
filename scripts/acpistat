@@ -21,7 +21,7 @@ else
 	printf 'ac_adapter_dir="%s"\nbattery_dir="%s"\n' "${ac_adapter_dir}" "${battery_dir}" >"${acpistat_cache}"
 fi
 
-${awk} -v battery_dir="${battery_dir}" -v ac_adapter_dir="${ac_adapter_dir}"  -f - <<-'_awk_code'
+exec ${awk} -v battery_dir="${battery_dir}" -v ac_adapter_dir="${ac_adapter_dir}"  -f - <<-'_awk_code'
 function hms(s) {
 	h=int(s/3600);
 	s=s-(h*3600);
