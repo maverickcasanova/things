@@ -371,6 +371,7 @@ alias rcp='rsync -v --progress'
 alias rmv='rsync -v --progress --remove-source-files'
 alias mv='mv -iv'
 alias rm='rm -iv'
+alias rmdir='rmdir -v'
 alias ln='ln -v'
 alias chmod="chmod -c"
 alias chown="chown -c"
