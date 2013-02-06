@@ -21,4 +21,3 @@ urxvt*geometry: 90x24
 urxvt*termName: rxvt-256color
 
 !urxvt*loginShell: true
-
