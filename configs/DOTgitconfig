@@ -9,5 +9,6 @@
 	c = commit --verbose
 	ca = commit --verbose --all
 	s = status --short
+	l = log --color --graph --pretty=format:'%C(yellow)%h%Creset%C(bold green)%d%Creset %s %Creset'
 [push]
 	default = simple
