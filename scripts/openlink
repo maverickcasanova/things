@@ -16,6 +16,9 @@ case "${string}" in
 	http://*|https://*)
 		${browser} "${string}"
 	;;
+	'<http://'*'>'|'<http://'*'>')
+		${browser} "$(echo "${string}" | sed 's#^<##; s#>$##')"
+	;;
 	*)
 		string="$(echo ${string} | sed 's# *$##g; s#&#%26#g; s^#^%23^g')"
 		${browser} "https://encrypted.google.com/search?hl=pl&q=${string}"
