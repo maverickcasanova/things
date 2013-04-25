@@ -13,8 +13,9 @@ BEGIN {
 	print "### Adfree hosts below ###"
 	cmd = "curl --silent --compressed  \"http://winhelp2002.mvps.org/hosts.txt\""
 	while (cmd | getline > 0) {
+		sub("\r$", "", $0)
 		if ($1 == "127.0.0.1") {
-			print $1, $2
+			if ($2 ~ "\.") 	print $1, $2
 		}
 	}
 	close(cmd)
