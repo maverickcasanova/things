@@ -27,6 +27,10 @@ map <silent> T :s/^/\t/<CR>:nohlsearch<CR>
 " 4 spaces tabs.
 set tabstop=4
 
+" make \d delete (for real, not cut)
+nnoremap <leader>d "_d
+vnoremap <leader>d "_d
+
 set nocompatible
 set bs=2
 
