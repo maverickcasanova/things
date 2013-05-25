@@ -58,7 +58,6 @@ fi
 
 amixer -q set Master mute
 
-
 # Drop disk caches if there is more than 1GiB of them or if total memory is 2G or smaller.
 # we don't really want to waste time writtin all the caches to disk.
 if ! awk '$1 ~ /^(Cached|Buffers):$/ { cachebuffers += $2 }; $1 == "MemTotal:" { memtotal = int($2/1024) }; END { if (memtotal <= 2048) exit 1; if (int(cachebuffers/1024) > 1024) exit 1 }' /proc/meminfo; then
@@ -66,8 +65,11 @@ if ! awk '$1 ~ /^(Cached|Buffers):$/ { cachebuffers += $2 }; $1 == "MemTotal:" {
 	echo 1 >/proc/sys/vm/drop_caches
 fi
 
+awk '/MemTotal:/ { mem_total = $2 }; /MemFree:/ {mem_free = $2 }; END { print ">>>", (mem_total - mem_free)/1024, "MB will be written to disk ..." }' /proc/meminfo
+
 ### Suspend to disk.
 einfo "Suspending to disk ..."
+sleep 1
 #s2disk
 echo disk > /sys/power/state
 
