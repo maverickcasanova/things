@@ -91,6 +91,22 @@ reload () {
           exec "${SHELL}" "$@"
 }
 
+escape_string() {
+	# Uber useful when you need to translate weird as fuck path into single-argument string.
+	local escape_string_input
+	echo -n "String to escape: "
+	read escape_string_input
+	_escaped_string="$(printf '%q' "$escape_string_input")"
+	if [ "$1" = '-o' ]; then
+		echo
+		echo "${_escaped_string}"
+		echo
+	else
+		export _escaped_string
+		echo "Escaped string has been pushed to \${_escaped_string} variable." 1>&2
+	fi
+}
+
 confirm() {
 	local answer
 	echo -ne "zsh: sure you want to run '${YELLOW}$@${NC}' [yN]? "
