@@ -16,7 +16,7 @@ case "${string}" in
 	http://*|https://*)
 		${browser} "${string}"
 	;;
-	'<http://'*'>'|'<http://'*'>')
+	'<http://'*'>'|'<https://'*'>')
 		${browser} "$(echo "${string}" | sed 's#^<##; s#>$##')"
 	;;
 	*)
