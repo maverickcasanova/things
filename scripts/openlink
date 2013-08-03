@@ -13,11 +13,8 @@ string="$(echo "${string}" | sed 's#^ *##g')"
 [ "${string}" ] || exit 1
 
 case "${string}" in
-	http://*|https://*)
-		${browser} "${string}"
-	;;
-	'<http://'*'>'|'<https://'*'>')
-		${browser} "$(echo "${string}" | sed 's#^<##; s#>$##')"
+	http://*|https://*|'<http://'*'>'|'<https://'*'>')
+		${browser} "$(echo "${string}" | sed -r 's#^<##; s#>$##; s#[[:space:]]+##g')"
 	;;
 	*)
 		string="$(echo "${string}" | sed 's# *$##g; s#&#%26#g; s^#^%23^g')"
