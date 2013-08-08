@@ -13,7 +13,6 @@ update() {
 	fi
 }
 
-update ~/.asoundrc configs/DOTasoundrc
 update /etc/dnsmasq.conf configs/dnsmasq.conf
 update ~/.zshrc configs/DOTzshrc
 update ~/.Xdefaults  configs/DOTXDefaults
