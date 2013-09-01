@@ -282,7 +282,7 @@ rbac_auth() {
 	if [ "${USER}" = 'root' ]; then
 		if ! grep -qE '^RBAC:' "/proc/self/status" && command -v gradm > /dev/null 2>&1; then
 			echo -e "\n${BLUE}*${NC} ${GREEN}RBAC${NC} Authorize to '${auth_to_role}' RBAC role."
-			gradm -a "${auth_to_role}"
+			gradm -a "${auth_to_role}" && exec "${SHELL}" "$@"
 		fi
 	fi
 }
