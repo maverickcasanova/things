@@ -6,7 +6,7 @@ readonly workdir="${scriptpath%/*}"
 update() {
 	if [ -z "$1" ] || [ -z "$2" ]; then return 1; fi
 	if [ -f "$1" ] && [ -r "$1" ] && ! [ -L "$1" ] && ! cmp --silent "$1" "$2"; then
-		echo ">>> Updating '$2' from '$1' ..."
+		#echo ">>> Updating '$2' from '$1' ..."
 		cat "$1" > "${workdir}/$2"
 	else
 		return 1
