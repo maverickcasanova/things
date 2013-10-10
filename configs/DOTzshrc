@@ -441,4 +441,4 @@ esac
 bindkey "^R" history-incremental-pattern-search-backward 
 bindkey "^S" history-incremental-pattern-search-forward
 
-if [ -f ~/.alert ]; then cat ~/.alert; fi
+if [ -f ~/.alert ]; then echo '>>> Check ~/.alert'; fi
