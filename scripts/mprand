@@ -7,10 +7,12 @@ video_player="${video_player:-mpv}"
 #   To play random AMV on full screen: cd video/amv && mprand --fs
 #   Just to play music from random AMVs: cd video/amv && mpvrand --ao null
 
+command -v "${video_player}" 2>/dev/null || { echo "Wrong video_player variable."; exit 1; }
+
 while true; do
 	IFS=$'\n'
 	for i in $(find "$PWD" -type f | sort -R); do
-		mplayer "$i" "$@"
+		"${video_player}" "$i" "$@"
 		sleep 0.3
 	done
 	sleep 0.3
