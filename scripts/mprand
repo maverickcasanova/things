@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# set env var video_player if anything other than mpv.
+video_player="${video_player:-mpv}"
+
+# Example usage:
+#   To play random AMV on full screen: cd video/amv && mprand --fs
+#   Just to play music from random AMVs: cd video/amv && mpvrand --ao null
+
+while true; do
+	IFS=$'\n'
+	for i in $(find "$PWD" -type f | sort -R); do
+		mplayer "$i" "$@"
+		sleep 0.3
+	done
+	sleep 0.3
+done
