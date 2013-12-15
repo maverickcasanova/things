@@ -38,10 +38,10 @@ BEGIN {
 	getline battery_usage_now < ( battery_dir "/current_now" )
 	battery_percent = int((battery_remaining*100)/(battery_total))
 	if (battery_percent > 100) battery_percent = 100
-	if (ac_status == 0) {
-		print "AC " ( (ac_status == 1) ? "on-line" : "off-line" ) ", " battery_status ", " battery_percent "%, " hms(3600*(battery_remaining/battery_usage_now))
+	if (ac_status) {
+		print "AC on-line", ( (battery_status == "Full") ? "Charged" : battery_status ) ", " battery_percent "%"
 	} else {
-		print "AC " ( (ac_status == 1) ? "on-line" : "off-line" ) ", " ( (battery_status == "Full") ? "Charged" : battery_status ) ", " battery_percent "%"
+		print "AC off-line", battery_status ", " battery_percent "%, " hms(3600*(battery_remaining/battery_usage_now))
 	}
 }
 _awk_code
