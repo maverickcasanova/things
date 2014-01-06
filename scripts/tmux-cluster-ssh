@@ -1,0 +1,13 @@
+#!/bin/sh
+[ "$#" -lt 1 ] && exit 1
+
+session_name="tmux-cluster-ssh-$RANDOM"
+
+tmux new-session -d -s "$session_name" "ssh $1"
+shift
+for i in "$@"; do
+	tmux split-window -t "$session_name" -h "ssh $1"
+	tmux select-layout -t "$session_name" tiled >/dev/null
+done
+
+tmux attach-session -t "$session_name"
