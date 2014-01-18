@@ -1,0 +1,28 @@
+vo=xv
+
+ao=alsa
+#ao=null
+
+autofit=800
+
+# Bigger cache, help a lot especially with 720p/1080p etc.
+cache=131072
+cache-min = 20.0
+cache-seek-min = 50
+
+# most .txt are in cp1250
+subcp=cp1250
+# Move subs a little up.
+sub-pos=97
+
+# OSD font settings.
+sub-text-font="Arial Black"
+sub-text-font-size=52
+sub-text-back-color="#80000000"
+ass=no
+
+alang=jpn
+
+softvol=yes
+softvol-max=300
+
