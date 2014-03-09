@@ -53,3 +53,5 @@ autocmd BufReadPost *
 	\ endif
 
 set viminfo=\'100,\"1000,:100
+
+set modeline
