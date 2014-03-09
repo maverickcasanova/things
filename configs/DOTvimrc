@@ -3,6 +3,7 @@ imap <F2> <C-O>:set nu!<CR>
 map <F3> :nohl<CR>
 imap <F3> <C-O>:nohl<CR>
 set pastetoggle=<F4>
+nnoremap <F5> :set list!<CR>
 
 "Ignore case in searches
 set ignorecase
@@ -13,6 +14,9 @@ set autoindent
 
 " Treat .inc files as .php.
 au BufReadPost *.inc set syntax=php
+
+" Config how set list display white spaces
+set listchars=eol:$,tab:>-,trail:~,extends:>,precedes:<
 
 " Comment or uncomment current/selected lines.
 map <silent> C :s/^/#/<CR>:nohlsearch<CR>
@@ -26,6 +30,12 @@ map <silent> T :s/^/\t/<CR>:nohlsearch<CR>
 
 " 4 spaces tabs.
 set tabstop=4
+
+" Make backspace kill 4 spaces in one go.
+set softtabstop=4
+
+" Insert $tabstop number spaces instead of tab.
+set expandtab
 
 " make \d delete (for real, not cut)
 nnoremap <leader>d "_d
