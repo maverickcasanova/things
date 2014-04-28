@@ -1,0 +1,23 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+my $fh;
+open $fh, '<', '/etc/passwd';
+while (<$fh>) {
+    chomp($_);
+    my @arr = split ':', $_;
+    if ($arr[2] >= 1000) {
+        my $user = $arr[0];
+        my @output = qx("quota" "-w" "-s" "-u" "$user");
+        for (@output) {
+            next unless ($_ =~ m/^\/dev\//);
+            chomp($_);
+            my @derp = split /\s+/, $_;
+            printf "%-15s %-7s / %s\n", $user, $derp[1], $derp[3];
+        }
+    }
+}
+close $fh;
+
