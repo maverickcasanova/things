@@ -15,7 +15,7 @@ XTerm*metaSendsEscape: true
 
 urxvt.font: xft:Terminus:style=regular:size=11:antialias=false:lang=pl,xft:DejaVu Sans Mono:style=Bold:antialias=false
 
-urxvt*color4: #729FCF
+urxvt*color4: #0471e1
 urxvt*color12: #729FCF
 urxvt*geometry: 90x24
 urxvt*termName: rxvt-256color
