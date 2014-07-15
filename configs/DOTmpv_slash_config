@@ -11,15 +11,16 @@ cache-min = 20.0
 cache-seek-min = 50
 
 # most .txt are in cp1250
-subcp=cp1250
+sub-codepage=cp1250
 # Move subs a little up.
 sub-pos=97
 
 # OSD font settings.
+sub-ass=no
 sub-text-font="Arial Black"
 sub-text-font-size=52
 sub-text-back-color="#80000000"
-ass=no
+sub-text-border-size=0.0
 
 alang=jpn
 
