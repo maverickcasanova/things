@@ -1,0 +1,35 @@
+#!/bin/sh
+
+# A tiny helper to do git sparse checkouts as simple as only possible.
+
+# Usage: ./git-sparse-checkout <repository> <target> [dirs to fetch]
+
+die() {
+    echo "$*" >&2
+    exit 1
+}
+
+if [ "$#" -lt 3 ]; then
+    die 'Too few arguments.'
+fi
+
+repo="$1"; shift
+target="$1"; shift
+
+test -d "${target}" && die "Target directory '${target}' already exist."
+
+set -e
+
+mkdir "${target}"
+cd "${target}"
+
+git init
+git config core.sparsecheckout true
+
+for i in "$@"; do
+    echo "$i" >>'.git/info/sparse-checkout'
+done
+
+git remote add -f origin "${repo}"
+git pull origin master
+git branch -u origin/master
