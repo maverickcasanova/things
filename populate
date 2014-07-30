@@ -22,5 +22,6 @@ update ~/.vimrc configs/DOTvimrc
 update ~/.compton.conf configs/DOTcompton.conf
 update ~/.gitconfig configs/DOTgitconfig && sed -r 's#(name|email) =.*#\1 = NULL#g;' -i configs/DOTgitconfig
 update ~/.mpv/config configs/DOTmpv_slash_config
+update ~/.xmodmap configs/DOTxmodmap
 
 git status --porcelain
