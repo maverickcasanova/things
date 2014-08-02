@@ -442,7 +442,9 @@ case $TERM in
         bindkey "^[[A" history-beginning-search-backward #Up Arrow
         bindkey "^[[B" history-beginning-search-forward #Down Arrow
         bindkey "^[Oc" forward-word # control + right arrow
+        bindkey "^[OC" forward-word # control + right arrow
         bindkey "^[Od" backward-word # control + left arrow
+        bindkey "^[OD" backward-word # control + left arrow
         bindkey "^H" backward-kill-word # control + backspace
         bindkey "^[[3^" kill-word # control + delete
     ;;
