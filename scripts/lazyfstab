@@ -42,16 +42,16 @@ genfstab() {
 
 		case "${mountpoint}" in
 			'/')
-				echo -e "${devicepath}\t${mountpoint}\t${fstype}\trelatime\t0 1"
+				echo -e "${devicepath}\t${mountpoint}\t${fstype}\tnoatime\t0 1"
 			;;
 			'/boot'|'/home')
-				echo -e "${devicepath}\t${mountpoint}\t${fstype}\trelatime,nosuid,nodev\t0 1"
+				echo -e "${devicepath}\t${mountpoint}\t${fstype}\tnoatime,nosuid,nodev\t0 1"
 			;;
 			'/tmp')
-				echo -e "${devicepath}\t${mountpoint}\t${fstype}\trelatime,nosuid,nodev,noexec\t0 2"
+				echo -e "${devicepath}\t${mountpoint}\t${fstype}\tnoatime,nosuid,nodev,noexec\t0 2"
 			;;
 			'/var/tmp')
-				echo -e "${devicepath}\t${mountpoint}\t${fstype}\trelatime,nosuid,nodev,noexec\t0 2"
+				echo -e "${devicepath}\t${mountpoint}\t${fstype}\tnoatime,nosuid,nodev,noexec\t0 2"
 			;;
 			'/media/'*)
 				# We don't really want include anything for /media in fstab.
