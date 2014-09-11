@@ -2,6 +2,18 @@
 # Author: Piotr Karbowski <piotr.karbowski@gmail.com>
 # License: beerware.
 
+# Are we running under grsecurity's RBAC?
+rbac_auth() {
+    local auth_to_role='admin'
+    if [ "${USER}" = 'root' ]; then
+        if ! grep -qE '^RBAC:' "/proc/self/status" && command -v gradm > /dev/null 2>&1; then
+            echo -e "\n${BLUE}*${NC} ${GREEN}RBAC${NC} Authorize to '${auth_to_role}' RBAC role."
+            gradm -a "${auth_to_role}" && exec "${SHELL}" "$@"
+        fi
+    fi
+}
+rbac_auth
+
 # Basic zsh config.
 umask 077
 ZDOTDIR=${ZDOTDIR:-${HOME}}
@@ -286,17 +298,6 @@ man() {
     fi
 }
 
-# Are we running under grsecurity's RBAC?
-rbac_auth() {
-    local auth_to_role='admin'
-    if [ "${USER}" = 'root' ]; then
-        if ! grep -qE '^RBAC:' "/proc/self/status" && command -v gradm > /dev/null 2>&1; then
-            echo -e "\n${BLUE}*${NC} ${GREEN}RBAC${NC} Authorize to '${auth_to_role}' RBAC role."
-            gradm -a "${auth_to_role}" && exec "${SHELL}" "$@"
-        fi
-    fi
-}
-#rbac_auth
 
 # Check if we started zsh in git worktree, useful with tmux when your new zsh may spawn in source dir.
 git_check_if_worktree
