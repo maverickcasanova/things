@@ -117,11 +117,11 @@ escape() {
 
 confirm() {
     local answer
-    echo -ne "zsh: sure you want to run '${YELLOW}$@${NC}' [yN]? "
+    echo -ne "zsh: sure you want to run '${YELLOW}$*${NC}' [yN]? "
     read -q answer
         echo
     if [[ "${answer}" =~ ^[Yy]$ ]]; then
-        command "${=1}" "${=@:2}"
+        command "${@}"
     else
         return 1
     fi
