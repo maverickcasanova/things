@@ -133,12 +133,12 @@ confirm_wrapper() {
         shift
     fi
 
-    local runcommand="$1"; shift
+    local prefix=''
 
     if [ "${as_root}" = 'true' ] && [ "${USER}" != 'root' ]; then
-        runcommand="sudo ${runcommand}"
+        prefix="sudo"
     fi
-    confirm "${runcommand}" "$@"
+    confirm "${prefix}" "$@"
 }
 
 poweroff() { confirm_wrapper --root $0 "$@"; }
