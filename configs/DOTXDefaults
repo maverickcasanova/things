@@ -1,8 +1,4 @@
-URxvt.foreground: #fff
-URxvt.background: #000
 URxvt*scrollBar:false
-xterm*foreground: #fff
-xterm*background: #000
 
 URxvt.perl-ext-common:  default,-searchable-scrollback
 #URxvt*perl-ext-common: selection-autotransform,matcher
@@ -15,9 +11,15 @@ XTerm*metaSendsEscape: true
 
 urxvt.font: xft:Terminus:style=regular:size=11:antialias=false:lang=pl,xft:DejaVu Sans Mono:style=Bold:antialias=false
 
-urxvt*color4: #0471e1
-urxvt*color12: #729FCF
+!urxvt*color4: #0471e1
 urxvt*geometry: 90x24
-urxvt*termName: rxvt-256color
+#urxvt*termName: rxvt-256color
 
 !urxvt*loginShell: true
+
+*.cursorColor: #eee
+*.foreground:  #eee
+*.background:  #000
+
+*color12: #729FCF
+
