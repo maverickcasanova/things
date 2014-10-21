@@ -13,7 +13,7 @@ urxvt.font: xft:Terminus:style=regular:size=11:antialias=false:lang=pl,xft:DejaV
 
 !urxvt*color4: #0471e1
 urxvt*geometry: 90x24
-urxvt*termName: rxvt-256color
+#urxvt*termName: rxvt-256color
 
 !urxvt*loginShell: true
 
