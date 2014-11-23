@@ -1,0 +1,54 @@
+#!/bin/sh
+# Usage:
+#   acard - generate ~/.asoundrc with cards from /proc/asound/cards.
+#   acard <string> - will match first card with USB in name and make it default.
+# Example:
+#   acard usb
+#   acard dac
+
+GREEN='\e[1;32m'
+YELLOW='\e[1;33m'
+NC='\e[0m'
+
+cards() {
+    awk -f - /proc/asound/cards <<-'END'
+		/^ *[0-9]+/ {
+		    card = $1;
+		    #sub(/.*\]: /, "")
+		    getline
+		    sub(/^ */, "")
+		    sub(/ at .*/, "")
+		    print card, $0
+		}
+	END
+}
+
+asoundrc="${HOME}/.asoundrc"
+
+default_set=''
+
+true > "${asoundrc}"
+while read id card; do
+    echo "pcm.card${id} {" >>"${asoundrc}"
+    echo "    # ${card}" >>"${asoundrc}"
+    echo "    type hw" >>"${asoundrc}"
+    echo "    card ${id}" >>"${asoundrc}"
+    echo "}" >>"${asoundrc}"
+
+    if ! [ "${default_set}" ] && [ "$1" ]; then
+        if echo "$card" | grep -iq "$1"; then
+            echo "pcm.!default card${id}" >>"${asoundrc}"
+            default_set="${id}"
+        fi
+    elif [ "${id}" = '0' ]; then
+        default_set="${id}"
+    fi
+    if [ "${default_set}" ] && [ "${default_set}" = "${id}" ]; then
+        prefix="(default)"
+    else
+        prefix=''
+    fi
+    printf "${GREEN}%-9s${NC} %s\n" "${prefix}" "${card}"
+done <<-END
+	$(cards)
+END
