@@ -1,4 +1,5 @@
-vo=xv
+#hwdec=vaapi-copy
+vo=opengl-hq:interpolation:tscale=mitchell
 
 ao=alsa
 #ao=null
@@ -7,8 +8,6 @@ autofit=800
 
 # Bigger cache, help a lot especially with 720p/1080p etc.
 cache=131072
-cache-min = 20.0
-cache-seek-min = 50
 
 # most .txt are in cp1250
 sub-codepage=cp1250
@@ -27,3 +26,6 @@ alang=jpn
 softvol=yes
 softvol-max=300
 
+no-resume-playback
+
+geometry=50%:50%
