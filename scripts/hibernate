@@ -64,12 +64,11 @@ if ! awk '$1 ~ /^(Cached|Buffers):$/ { cachebuffers += $2 }; $1 == "MemTotal:" {
 	einfo 'Dropping disk caches ...'
 	echo 1 >/proc/sys/vm/drop_caches
 fi
-
+sleep 3
 awk '/MemTotal:/ { mem_total = $2 }; /MemFree:/ {mem_free = $2 }; END { print ">>>", (mem_total - mem_free)/1024, "MB will be written to disk ..." }' /proc/meminfo
 
 ### Suspend to disk.
 einfo "Suspending to disk ..."
-sleep 1
 #s2disk
 echo disk > /sys/power/state
 
@@ -79,13 +78,10 @@ if [ -f '/usr/share/wicd/daemon/autoconnect.py' ]; then
 	command -v wicd-cli >/dev/null 2>&1 && wicd-cli --wireless --scan
 	python2 /usr/share/wicd/daemon/autoconnect.py
 fi
-if command -v cpufreq-set > /dev/null 2>&1; then
-	einfo "Setting CPU Governor to ${governor:-ondemand} ..."
-	cpufreq-set -r -g "${governor:-ondemand}"
-fi
 
 if command -v hdparm > /dev/null 2>&1; then
 	for hd in "${!hdparm_apms[@]}"; do
+        [ "${hdparm_apms[${hd}]}" ] || continue
 		einfo "Setting back APM level on ${hd} to '${hdparm_apms[${hd}]}'."
 		hdparm -B "${hdparm_apms[${hd}]}" "/dev/${hd}" > /dev/null 2>&1
 	done
