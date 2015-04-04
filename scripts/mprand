@@ -12,6 +12,8 @@ command -v "${video_player}" 2>/dev/null || { echo "Wrong video_player variable.
 while true; do
 	IFS=$'\n'
 	for i in $(find -L "$PWD"/ -type f | sort -R); do
+        shopt -s nocasematch;
+        if [[ "$i" =~ \.(jpeg|jpg|png|gif)$ ]]; then continue; fi
 		"${video_player}" "$i" "$@"
 		sleep 0.3
 	done
