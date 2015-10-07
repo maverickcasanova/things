@@ -1,4 +1,4 @@
-hwdec=vaapi
+#hwdec=vaapi
 vo=opengl-hq:interpolation:tscale=mitchell:dscale=mitchell
 
 ao=alsa
