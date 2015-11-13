@@ -9,6 +9,9 @@ autofit=800
 # Bigger cache, help a lot especially with 720p/1080p etc.
 cache=131072
 
+# usb dac....
+audio-format=s16
+
 # most .txt are in cp1250
 sub-codepage=cp1250
 # Move subs a little up.
