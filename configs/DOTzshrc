@@ -180,7 +180,7 @@ begin_with() {
 
 termtitle() {
     case "$TERM" in
-        rxvt*|xterm|nxterm|gnome|screen|screen-*)
+        rxvt*|xterm*|nxterm|gnome|screen|screen-*)
             local prompt_host="${(%):-%m}"
             local prompt_user="${(%):-%n}"
             local prompt_char="${(%):-%~}"
@@ -420,6 +420,7 @@ alias rmdir='rmdir -v'
 alias ln='ln -v'
 alias chmod="chmod -c"
 alias chown="chown -c"
+alias mkdir="mkdir -v"
 
 if command -v colordiff > /dev/null 2>&1; then
     alias diff="colordiff -Nuar"
