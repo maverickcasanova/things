@@ -66,6 +66,7 @@ if ! awk '$1 ~ /^(Cached|Buffers):$/ { cachebuffers += $2 }; $1 == "MemTotal:" {
 fi
 sleep 3
 awk '/MemTotal:/ { mem_total = $2 }; /MemFree:/ {mem_free = $2 }; END { print ">>>", (mem_total - mem_free)/1024, "MB will be written to disk ..." }' /proc/meminfo
+sleep 0.1
 
 ### Suspend to disk.
 einfo "Suspending to disk ..."
@@ -73,6 +74,8 @@ einfo "Suspending to disk ..."
 echo disk > /sys/power/state
 
 ### After resume.
+iw wlan0 set power_save off >/dev/null 2>&1
+
 if [ -f '/usr/share/wicd/daemon/autoconnect.py' ]; then
 	einfo 'Poking wicd to autoconnect.'
 	command -v wicd-cli >/dev/null 2>&1 && wicd-cli --wireless --scan
@@ -94,10 +97,6 @@ if [ -f "/sys/devices/virtual/dmi/id/product_name" ] && [ "$(< /sys/devices/virt
 	else
 		echo "!!! Unable to disable Nvidia GPU."
 	fi
-fi
-
-if command -v le_power >/dev/null 2>&1; then
-	le_power auto
 fi
 
 if [ "${zram_swap}" = 'true' ]; then
