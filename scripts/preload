@@ -1,0 +1,21 @@
+#!/usr/bin/env perl
+
+# Preload first $preload_up_to megabytes of specified files into page caches.
+
+use strict;
+use warnings;
+
+my $fh;
+my $content;
+
+my $preload_up_to = 25;
+
+for(@ARGV) {
+    next if not -f;
+    next if not -s;
+    printf("Preloading %s ...\n", $_);
+    open($fh, "<", $_) or die;
+    read($fh,$content, 1024*1024*${preload_up_to}) or die;
+    undef($content);
+    close($fh) or die;
+}
