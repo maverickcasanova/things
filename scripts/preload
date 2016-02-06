@@ -15,7 +15,7 @@ for(@ARGV) {
     next if not -s;
     printf("Preloading %s ...\n", $_);
     open($fh, "<", $_) or die;
-    read($fh,$content, 1024*1024*${preload_up_to}) or die;
+    read($fh, $content, 1024*1024*${preload_up_to}) or die;
     undef($content);
     close($fh) or die;
 }
