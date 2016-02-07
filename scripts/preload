@@ -5,11 +5,11 @@
 use strict;
 use warnings;
 
+my $max_processes = 3;
+my $preload_up_to = 15;
+
 my $fh;
 my $content;
-
-my $max_processes = 2;
-my $preload_up_to = 15;
 
 sub preload_file {
     printf("Preloading %s ...\n", $_);
@@ -38,6 +38,8 @@ if ($fm_is_avalabile) {
         
         $fm->finish;
     }
+
+    $fm->wait_all_children
 } else {
     for (@ARGV) {
         next if not -f;
