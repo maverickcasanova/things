@@ -1,5 +1,5 @@
 #hwdec=vaapi
-vo=opengl-hq:interpolation:tscale=mitchell:dscale=mitchell
+vo=opengl:interpolation:tscale=oversample:dscale=mitchell
 video-sync=display-resample
 
 ao=alsa
