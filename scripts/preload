@@ -5,8 +5,8 @@
 use strict;
 use warnings;
 
-my $max_processes = 3;
-my $preload_up_to = 15;
+my $max_processes = 5;
+my $preload_up_to = 10;
 
 my $fh;
 my $content;
