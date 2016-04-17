@@ -241,7 +241,7 @@ git_check_if_worktree() {
 
 git_branch() {
     git_branch="$(git symbolic-ref HEAD 2>/dev/null)"
-    git_branch="${git_branch##*/}"
+    git_branch="${git_branch#refs/heads/}"
     git_branch="${git_branch:-no branch}"
 }
 
