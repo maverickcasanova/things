@@ -1,0 +1,71 @@
+#!/usr/bin/env perl
+
+# Split video file into multiple one.
+
+# Usage:
+#     ffsplit <video_file> <text_file_with_range>
+#     ffsplit concert.mpv data.txt
+#
+# The text file format
+#    <start_time> <end_time>
+#
+#
+# Example text file with range
+#    00:00:00 00:05:14
+#    00:06:08 00.11:01
+#    00:10:23 00:18:00
+#
+
+use strict;
+use warnings;
+
+sub time_to_seconds {
+    my ($h, $m, $s) = split(/:/, $_[0]);
+    $s += $h * 60 * 60;
+    $s += $m * 60;
+    
+    return $s;
+}
+
+sub duration {
+    my ($start, $end) = @_;
+
+    my $start_s = time_to_seconds($start);
+    my $end_s = time_to_seconds($end);
+
+    my $duration = $end_s - $start_s;
+
+    return sprintf("%02d:%02d:%02d", int($duration/60/60)%24, int($duration/60)%60, $duration%60);
+}
+
+die "Wrong arguments!\n" if not scalar @ARGV == 2;
+
+my $video_file = $ARGV[0];
+my $data_file = $ARGV[1];
+
+(my $video_file_ext = $video_file) =~ s/.*\.//;
+
+(my $video_file_name_without_ext = $video_file) =~ s/\.[^.]+$//;
+
+my $index = 0;
+
+open(my $data, "<", $data_file) or die;
+while(<$data>) {
+    chomp;
+    my ($start, $end) = split(/\s+/);
+
+    my $duration = duration($start, $end);
+
+    $index++;
+
+    system(
+        "ffmpeg",
+        "-i", "$video_file",
+        "-acodec", "copy",
+        "-vcodec", "copy", 
+        "-ss", $start, 
+        "-t", $duration, 
+        sprintf("%s_%03d.%s", $video_file_name_without_ext, $index, $video_file_ext)
+    );
+}
+close($data);
