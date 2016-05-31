@@ -11,4 +11,4 @@ response="$(curl -s -H "${auth_header}" -F "image=@${img}" 'https://api.imgur.co
 echo -n 'Image URL:     '
 sed 's%.*"link":"\([^"]*\).*%\1%; s%\\%%g' <<< "${response}"
 echo -n 'Delete URL:    https://imgur.com/delete/'
-sed 's%.*"deletehash":"\([^"]*\).*%\1%; s%\\%%g' <<< "${response}"
+sed 's%.*"deletehash":"\([^"]*\).*%\1%' <<< "${response}"
