@@ -38,6 +38,10 @@ sub duration {
     return sprintf("%02d:%02d:%02d", int($duration/60/60)%24, int($duration/60)%60, $duration%60);
 }
 
+sub einfo {
+    print ">>> [INFO] @_\n";
+}
+
 die "Wrong arguments!\n" if not scalar @ARGV == 2;
 
 my $video_file = $ARGV[0];
@@ -57,8 +61,8 @@ while(<$data>) {
     my $duration = duration($start, $end);
 
     $index++;
-
-    system(
+    
+    my @cmd = (
         "ffmpeg",
         "-i", "$video_file",
         "-acodec", "copy",
@@ -67,5 +71,11 @@ while(<$data>) {
         "-t", $duration, 
         sprintf("%s_%03d.%s", $video_file_name_without_ext, $index, $video_file_ext)
     );
+
+    einfo('Running:', @cmd);
+    system(@cmd);
+    if ($? >> 8 != 0) {
+        die "Something went wrong."
+    }
 }
 close($data);
