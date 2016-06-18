@@ -1,8 +1,5 @@
 #!/bin/bash
 
-script_dir="$(readlink -f "$0")"
-script_dir="${script_dir%/*}"
-
 adblock_hosts_source=(
     'http://hosts-file.net/ad_servers.txt'
     'http://winhelp2002.mvps.org/hosts.txt'
@@ -10,16 +7,10 @@ adblock_hosts_source=(
     'https://pgl.yoyo.org/adservers/serverlist.php?hostformat=hosts&showintro=0&mimetype=plaintext'
 )
 
-temp_file="$(mktemp "${script_dir}"/tmp.XXXXX)"
-
-for url in "${adblock_hosts_source[@]}"; do
-    curl -s -k --compressed "${url}" | awk '/^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/ { print $2 }' >>"${temp_file}"
-done
-
-rm -f hosts_file
-
-while read adhost; do
+{ 
+    for url in "${adblock_hosts_source[@]}"; do
+        curl -s -k --compressed "${url}" | awk '/^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/ { print $2 }'
+    done
+} | sort -u | while read adhost; do
     printf '0.0.0.0 %s\n' "${adhost}"
-done < <(sort -u "${temp_file}")
-
-rm "${temp_file}"
+done
