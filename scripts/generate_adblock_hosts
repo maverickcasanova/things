@@ -9,7 +9,7 @@ adblock_hosts_source=(
 
 { 
     for url in "${adblock_hosts_source[@]}"; do
-        curl -s -k --compressed "${url}" | awk '/^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/ { print $2 }'
+        curl -s -k -L --compressed "${url}" | awk '/^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/ { print $2 }'
     done
 } | sort -u | while read adhost; do
     printf '0.0.0.0 %s\n' "${adhost}"
