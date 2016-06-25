@@ -1,7 +1,7 @@
 #!/bin/bash
 
 adblock_hosts_source=(
-    'http://hosts-file.net/ad_servers.txt'
+    'https://hosts-file.net/ad_servers.txt'
     'http://winhelp2002.mvps.org/hosts.txt'
     'http://adaway.org/hosts.txt'
     'https://pgl.yoyo.org/adservers/serverlist.php?hostformat=hosts&showintro=0&mimetype=plaintext'
