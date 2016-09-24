@@ -1,9 +1,11 @@
-#hwdec=vaapi
-vo=opengl:interpolation:tscale=oversample:dscale=mitchell
+vo=opengl
 video-sync=display-resample
 
+interpolation
+tscale=oversample
+dscale=mitchell
+
 ao=alsa
-#ao=null
 
 autofit=800
 
@@ -26,9 +28,6 @@ sub-text-back-color="#80000000"
 sub-text-border-size=0.0
 
 alang=jpn
-
-softvol=yes
-softvol-max=300
 
 no-resume-playback
 
