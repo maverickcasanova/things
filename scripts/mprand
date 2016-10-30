@@ -1,21 +1,83 @@
-#!/bin/bash
+#!/usr/bin/env perl
 
-# set env var video_player if anything other than mpv.
-video_player="${video_player:-mpv}"
+# The script is meant to scan the current working dir, randomize the list of files
+# and play them. Useful for AMVs and other music videos.
+# All the arguments are passed, so user can run 'mprand --no-videol' to play only audio.
+#
+# Additionally, script will fork and then preload the next file.
 
-# Example usage:
-#   To play random AMV on full screen: cd video/amv && mprand --fs
-#   Just to play music from random AMVs: cd video/amv && mpvrand --ao null
+use strict;
+use warnings;
 
-command -v "${video_player}" 2>/dev/null || { echo "Wrong video_player variable."; exit 1; }
+my $player = 'mpv';
+my $preload_up_to = 50;
 
-while true; do
-	IFS=$'\n'
-	for i in $(find -L "$PWD"/ -type f | sort -R); do
-        shopt -s nocasematch;
-        if [[ "$i" =~ \.(jpeg|jpg|png|gif)$ ]]; then continue; fi
-		"${video_player}" "$i" "$@"
-		sleep 0.3
-	done
-	sleep 0.3
-done
+use Cwd qw/ getcwd /;
+use List::Util qw/ shuffle /;
+use File::Find qw/ find /;
+use Time::HiRes qw/ usleep /;
+
+# This one is not in standard perl distributiion. :<
+use Parallel::ForkManager;
+
+my $cwd = getcwd;
+
+my @files;
+my @randomized_files;
+
+# 3 because $fm->start will wait for free child.
+# In best case scenario, we will have only single child
+# in the background.
+my $fm = new Parallel::ForkManager(3);
+
+$fm->set_waitpid_blocking_sleep(0);
+
+sub queue {
+    if (not -f) { return; }
+    # todo: skip \.(jpeg|jpg|png|gif)$ but maybe not with regex matching.
+    push(@files, $File::Find::name)
+}
+
+sub preload {
+    # Fork and return, preload the beginning of file in the child
+    # and then gracefully exit.
+
+    my $file = shift;
+
+    # Lazy check if $i+1 actually exist.
+    return if not $file;
+
+    print "[MPRAND] Preloading $file\n";
+
+    $fm->start and return;
+    open(my $fh, "<", $file) or die;
+    read($fh, my $content, 1024*1024*${preload_up_to}) or die;
+    undef($content);
+    close($fh) or die;
+    
+    # Only child gets here and it needs to die here
+    # and not return to the caller.
+    exit(0);
+}
+
+find({ wanted => \&queue, follow => 1}, $cwd);
+
+@randomized_files = shuffle(@files);
+
+while (1) {
+    # C-style loop to be able to easily lookup next item (for preload).
+    for (my $i = 0; $i < @randomized_files; $i++) {
+        my $file = $randomized_files[$i];
+
+        preload($randomized_files[$i+1]);
+
+        print "[MPRAND] Playing $file\n";
+
+        system($player, @ARGV, $file);
+    
+        # Sleep 0.05s to be able to catch ^C.
+        usleep(50000);
+    }
+    usleep(50000);
+}
+
