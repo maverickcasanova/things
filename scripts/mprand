@@ -54,10 +54,8 @@ sub preload {
     read($fh, my $content, 1024*1024*${preload_up_to}) or die;
     undef($content);
     close($fh) or die;
-    
-    # Only child gets here and it needs to die here
-    # and not return to the caller.
-    exit(0);
+
+    $fm->finish;
 }
 
 find({ wanted => \&queue, follow => 1}, $cwd);
