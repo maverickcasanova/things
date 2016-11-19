@@ -37,7 +37,7 @@ sub normalize_permissions {
 
     if ($mode != $change_to) {
         print "[$mode -> $change_to] $File::Find::name\n";
-        #chmod(oct($change_to), $file);
+        chmod(oct($change_to), $file);
     }
 }
 
