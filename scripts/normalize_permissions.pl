@@ -1,10 +1,15 @@
 #!/usr/bin/env perl
 
-# Normalize files and dirs in current working directory to a 'umask 022' one.
+# Normalize the permissions to a 'umask 022' one.
 # 
 # Useful when one runs with umask 077 but needs a easy way to 'publish' files.
 # For example, the /usr/src/ kernel sources, so the Gentoo's portage user can
 # actually build kernel modules in case of FEATURES=userpriv.
+#
+# Usage: 
+#     ./normalize_permissions.pl /path/to/adjust/permissions
+#     ./normalize_permissions.pl /usr/src
+
 
 use warnings;
 use strict;
@@ -27,15 +32,15 @@ sub normalize_permissions {
         return;
     }
 
-    my $mode = sprintf('%04o', (stat($file))[2] & 07777);
-
-    my $first           = substr($mode, 0, 1);
-    my $change_to       = $first . $modes{substr($mode, 1, 1)};
+    my $mode      = sprintf('%04o', (stat($file))[2] & 07777);
+    my $change_to = substr($mode, 0, 1) . $modes{substr($mode, 1, 1)};
 
     if ($mode != $change_to) {
         print "[$mode -> $change_to] $File::Find::name\n";
-        chmod(oct($change_to), $file);
+        #chmod(oct($change_to), $file);
     }
 }
 
-find(\&normalize_permissions, ".");
+die "Not enough arguments." if (scalar @ARGV < 1);
+
+find(\&normalize_permissions, @ARGV);
