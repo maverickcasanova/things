@@ -7,8 +7,8 @@
 # actually build kernel modules in case of FEATURES=userpriv.
 #
 # Usage: 
-#     ./normalize_permissions.pl /path/to/adjust/permissions
-#     ./normalize_permissions.pl /usr/src
+#     ./normalize_permissions /path/to/adjust/permissions
+#     ./normalize_permissions /usr/src
 
 
 use warnings;
