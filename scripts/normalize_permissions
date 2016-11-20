@@ -36,8 +36,11 @@ sub normalize_permissions {
     my $change_to = substr($mode, 0, 1) . $modes{substr($mode, 1, 1)};
 
     if ($mode != $change_to) {
-        print "[$mode -> $change_to] $File::Find::name\n";
-        chmod(oct($change_to), $file);
+        if (chmod(oct($change_to), $file)) {
+            print "[$mode -> $change_to] $File::Find::name\n";
+        } else {
+            print "[FAILED] [$mode -> $change_to] $File::Find::name: $!\n";
+        }
     }
 }
 
