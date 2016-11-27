@@ -341,6 +341,11 @@ autoload -U zargs
 # Turn on command substitution in the prompt (and parameter expansion and arithmetic expansion).
 setopt promptsubst
 
+
+# Prevent insert key from changing input mode.
+# (switch to Emacs mode)
+bindkey -e
+
 # Control-x-e to open current line in $EDITOR, awesome when writting functions or editing multiline commands.
 autoload -U edit-command-line
 zle -N edit-command-line
