@@ -20,9 +20,18 @@ border_width = 0
 background_color = #ffffff 0
 border_color = #ffffff 70
 
+# Launchers
+#launcher_icon_theme = black-white_2-Style
+#launcher_padding = 5 0 10
+#launcher_background_id = 9
+#launcher_icon_size = 20
+#launcher_item_app = /some/where/application.desktop
+#launcher_item_app = /usr/share/applications/keepassx.desktop
+
 #---------------------------------------------
 # PANEL
 #---------------------------------------------
+panel_items = TSC
 panel_monitor = all
 panel_position = top center
 panel_size = 100% 32
@@ -73,18 +82,18 @@ clock_background_id = 0
 #clock_lclick_command = xclock
 clock_rclick_command = orage
 
-#---------------------------------------------
-# BATTERY
-#---------------------------------------------
-battery = 0
-battery_low_status = 10
-battery_low_cmd = notify-send "battery low"
-bat1_font = sans 8
-bat2_font = sans 6
-battery_font_color = #ffffff 76
-battery_padding = 1 0
-battery_background_id = 0
-
+##---------------------------------------------
+## BATTERY
+##---------------------------------------------
+#battery = 0
+#battery_low_status = 10
+#battery_low_cmd = notify-send "battery low"
+#bat1_font = sans 8
+#bat2_font = sans 6
+#battery_font_color = #ffffff 76
+#battery_padding = 1 0
+#battery_background_id = 0
+#
 
 #---------------------------------------------
 # MOUSE ACTION ON TASK
