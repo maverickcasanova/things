@@ -20,13 +20,11 @@ $primary =~ s/\s+$//;
 # Strip leading and traling < >.
 $primary =~ s/^<(.*)>$/$1/;
 
-my $encoded = $encoder->encode($primary, { encode_reserved => 1});
-
 my $link;
-if ($encoded !~ m/^(http|https):\/\//) {
-    $link = "https://encrypted.google.com/search?q=" . $encoded;
+if ($primary !~ m/^(http|https):\/\//) {
+    $link = "https://encrypted.google.com/search?q=" . $encoder->encode($primary, { encode_reserved => 1});
 } else {
-    $link = $encoded;
+    $link = $primary;
 }
 
 system($browser, '--new-tab', $link);
