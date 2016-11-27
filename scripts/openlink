@@ -1,23 +1,32 @@
-#!/bin/sh
+#!/usr/bin/env perl
 
-browser='defaultbrowser'
-#browser='firefox'
+use strict;
+use warnings;
 
-command -v xsel >/dev/null 2>&1 || exit 1
+use URI::Encode;
+my $encoder = URI::Encode->new();
 
-string="$(xsel -p -o)"
+#my $browser = 'firefox';
+my $browser = 'defaultbrowser';
 
-# Remove leading and on the end of script spaces.
-string="$(echo "${string}" | sed 's#^ *##g')"
+my $primary = qx/ xsel -p -o /;
 
-[ "${string}" ] || exit 1
+exit 0 if (not $primary);
 
-case "${string}" in
-	http://*|https://*|'<http://'*'>'|'<https://'*'>')
-		${browser} "$(echo "${string}" | sed -r 's#^<##; s#>$##; s#[[:space:]]+##g')"
-	;;
-	*)
-		string="$(echo "${string}" | sed 's# *$##g; s#&#%26#g; s^#^%23^g')"
-		${browser} "https://encrypted.google.com/search?hl=pl&q=${string}"
-	;;
-esac
+# Trim leading and traling whitespaces.
+$primary =~ s/^\s+//;
+$primary =~ s/\s+$//;
+
+# Strip leading and traling < >.
+$primary =~ s/^<(.*)>$/$1/;
+
+my $encoded = $encoder->encode($primary, { encode_reserved => 1});
+
+my $link;
+if ($encoded !~ m/^(http|https):\/\//) {
+    $link = "https://encrypted.google.com/search?q=" . $encoded;
+} else {
+    $link = $encoded;
+}
+
+system($browser, '--new-tab', $link);
