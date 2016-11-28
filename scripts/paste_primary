@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Script to 'paste' the PRIMARY selection.
+# To be binded to something like control-shift-v.
+
+xsel -o -p | xdotool type --delay 0 --clearmodifiers --file -
