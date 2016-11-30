@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Jump to choosen window on any desktop.
+# Work best when shell is configured to alter terminal title with executed commands.
+
 eerror() {
     echo ">>> [ERROR] $*"
 }
@@ -20,8 +23,6 @@ for i in wmctrl dmenu; do
         die "Missing binary '$i'."
     fi
 done
-
-#wmctrl -lx | awk '$2 >= 0 { foo = ""; for (i = 5; i <= NF; i++) { foo = foo $i " " }; $2++; sub(/[^.]+\./, "", $3); printf("%s - %s - %s\n", $1, $3, foo) }' | dmenu -b -i -l 10 -sb '#a13d12' -p 'Select window:'
 
 declare -a windows
 while read id desktop wm_class hostname window_title; do
