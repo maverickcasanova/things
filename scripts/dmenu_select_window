@@ -1,0 +1,46 @@
+#!/bin/bash
+
+eerror() {
+    echo ">>> [ERROR] $*"
+}
+
+die() {
+    eerror "$*"
+    exit 1
+}
+
+dmenu_wrapper() {
+    dmenu -b -i -l 10 \
+        -sb '#a13d12' \
+        -p 'Select window to active:'
+}
+
+for i in wmctrl dmenu; do
+    if ! command -v "$i" >/dev/null 2>&1; then
+        die "Missing binary '$i'."
+    fi
+done
+
+#wmctrl -lx | awk '$2 >= 0 { foo = ""; for (i = 5; i <= NF; i++) { foo = foo $i " " }; $2++; sub(/[^.]+\./, "", $3); printf("%s - %s - %s\n", $1, $3, foo) }' | dmenu -b -i -l 10 -sb '#a13d12' -p 'Select window:'
+
+declare -a windows
+while read id desktop wm_class hostname window_title; do
+    if ! [ "${desktop}" -ge 0 ]; then
+        # Skip non-windows (conky, tint2 etc)
+        continue
+    fi
+
+    app_name="${wm_class#*.}"
+
+    windows+=( "${id} - ${app_name} - ${window_title}" )
+
+done < <(wmctrl -lx)
+
+read dmenu_selection _ < <(dmenu_wrapper < <(printf '%s\n' "${windows[@]}"))
+
+
+case "${dmenu_selection}" in
+    '0x'*)
+        wmctrl -ia "${dmenu_selection}"
+    ;;
+esac
