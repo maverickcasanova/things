@@ -3,9 +3,6 @@
 use strict;
 use warnings;
 
-use URI::Encode;
-my $encoder = URI::Encode->new();
-
 #my $browser = 'firefox';
 my $browser = 'defaultbrowser';
 
@@ -22,7 +19,7 @@ $primary =~ s/^<(.*)>$/$1/;
 
 my $link;
 if ($primary !~ m/^(http|https):\/\//) {
-    $link = "https://encrypted.google.com/search?q=" . $encoder->encode($primary, { encode_reserved => 1});
+    $link = "https://encrypted.google.com/search?q=" . $primary;
 } else {
     $link = $primary;
 }
