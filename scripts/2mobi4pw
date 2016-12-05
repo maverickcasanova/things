@@ -1,0 +1,11 @@
+#!/bin/sh
+
+for i in "$@"; do
+    test -f "$i" || continue
+    if [ -f "${i%.*}".mobi ]; then
+        echo "The '${i%.*}.mobi' already exist. Skipping."
+        continue
+    fi
+
+    ebook-convert "${i}" "${i%.*}".mobi --output-profile kindle_pw
+done
