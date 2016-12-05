@@ -15,6 +15,7 @@ die() {
 dmenu_wrapper() {
     dmenu -b -i -l 10 \
         -sb '#a13d12' \
+        -fn 'Terminus:style=regular:size=12:antialias=false'  \
         -p 'Select window to active:'
 }
 
