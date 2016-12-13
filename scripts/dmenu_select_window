@@ -14,9 +14,10 @@ die() {
 
 dmenu_wrapper() {
     dmenu -b -i -l 10 \
-        -sb '#a13d12' \
-        -fn 'Terminus:style=regular:size=12:antialias=false'  \
+        -fn 'Droid Sans Mono:pixelsize=15'  \
         -p 'Select window to active:'
+
+#        -sb '#a13d12' \
 }
 
 for i in wmctrl dmenu; do
@@ -36,7 +37,7 @@ while read id desktop wm_class hostname window_title; do
 
     windows+=( "${id} - ${app_name} - ${window_title}" )
 
-done < <(wmctrl -lx)
+done < <(wmctrl -lx | sort -k 2)
 
 read dmenu_selection _ < <(dmenu_wrapper < <(printf '%s\n' "${windows[@]}"))
 
