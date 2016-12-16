@@ -8,7 +8,7 @@ dmenu_wrapper() {
     dmenu_width='500'
     pull_up='140'
     x_offset="$(( (screen_w - dmenu_width) / 2 ))"
-    y_offset="$(( (screen_h - pull_up) / 2 ))"e
+    y_offset="$(( (screen_h - pull_up) / 2 ))"
 
     dmenu -i -l 10 \
         -y "${y_offset}" -x "${x_offset}" -w "${dmenu_width}" \
