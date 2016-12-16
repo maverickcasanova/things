@@ -13,11 +13,18 @@ die() {
 }
 
 dmenu_wrapper() {
-    dmenu -b -i -l 10 \
-        -fn 'Droid Sans Mono:pixelsize=15'  \
-        -p 'Select window to active:'
+    # A magic to position dmenu in the middle of screen.
+    read screen_w screen_h < <( xdpyinfo | sed -r '/dimensions:/!d; s/.*dimensions:[[:blank:]]+([0-9]+)x([0-9]+) pixels.*/\1 \2/')
+    dmenu_width='1000'
+    pull_up='200'
+    x_offset="$(( (screen_w - dmenu_width) / 2 ))"
+    y_offset="$(( (screen_h - pull_up) / 2 ))"
 
-#        -sb '#a13d12' \
+    dmenu -i -l 10 \
+        -y "${y_offset}" -x "${x_offset}" -w "${dmenu_width}" \
+        -fn 'Droid Sans Mono:pixelsize=15'  \
+        -sb '#a13d12' \
+        -p "$*"
 }
 
 for i in wmctrl dmenu; do
@@ -39,7 +46,7 @@ while read id desktop wm_class hostname window_title; do
 
 done < <(wmctrl -lx | sort -k 2)
 
-read dmenu_selection _ < <(dmenu_wrapper < <(printf '%s\n' "${windows[@]}"))
+read dmenu_selection _ < <(dmenu_wrapper 'Select window:' < <(printf '%s\n' "${windows[@]}"))
 
 
 case "${dmenu_selection}" in
