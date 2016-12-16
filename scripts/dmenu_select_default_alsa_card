@@ -3,9 +3,18 @@
 # Geenrate ~/.asoundrc with specified card as default.
 
 dmenu_wrapper() {
-    dmenu -b -i -l 10 \
+    # A magic to position dmenu in the middle of screen.
+    read screen_w screen_h < <( xdpyinfo | sed -r '/dimensions:/!d; s/.*dimensions:[[:blank:]]+([0-9]+)x([0-9]+) pixels.*/\1 \2/')
+    dmenu_width='500'
+    pull_up='140'
+    x_offset="$(( (screen_w - dmenu_width) / 2 ))"
+    y_offset="$(( (screen_h - pull_up) / 2 ))"e
+
+    dmenu -i -l 10 \
+        -y "${y_offset}" -x "${x_offset}" -w "${dmenu_width}" \
         -fn 'Droid Sans Mono:pixelsize=15'  \
-        -p 'Select default ALSA card:'
+        -sb '#a13d12' \
+        -p "$*"
 }
 
 for i in dmenu; do
@@ -25,7 +34,7 @@ cards() {
 }
 
 
-read dmenu_selection _ < <(dmenu_wrapper < <(cards))
+read dmenu_selection _ < <(dmenu_wrapper 'Set default ALSA device to:' < <(cards))
 
 if ! [ "${dmenu_selection}" ]; then
 	exit 0
