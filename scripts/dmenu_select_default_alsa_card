@@ -28,13 +28,14 @@ cards() {
 		/^ *[0-9]+/ {
 		    card = $1;
 			sub(/.*- /, "")
-			printf("%-2s %s\n", card, $0)
+			printf("%s %128s\n", $0, card)
 		}
 	END
 }
 
 
-read dmenu_selection _ < <(dmenu_wrapper 'Set default ALSA device to:' < <(cards))
+read dmenu_selection < <(dmenu_wrapper 'Set default ALSA device to:' < <(cards))
+dmenu_selection="${dmenu_selection##* }"
 
 if ! [ "${dmenu_selection}" ]; then
 	exit 0
