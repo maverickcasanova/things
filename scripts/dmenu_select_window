@@ -46,12 +46,14 @@ while read id desktop wm_class hostname window_title; do
         app_name="${app_name:0:17}..."
     fi
 
-    windows+=( "${window_title} - ${app_name} - ${id}" )
+    printf -v i_wanna_sprintf "%-104s %s" "${window_title} - ${app_name}" "${id}"
+
+    windows+=( "${i_wanna_sprintf}" )
 
 done < <(wmctrl -lx | sort -k 2)
 
 read dmenu_selection < <(dmenu_wrapper 'Select window:' < <(printf '%s\n' "${windows[@]}"))
-dmenu_selection="${dmenu_selection##* - }"
+dmenu_selection="${dmenu_selection##* }"
 
 case "${dmenu_selection}" in
     '0x'*)
