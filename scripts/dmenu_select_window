@@ -42,12 +42,16 @@ while read id desktop wm_class hostname window_title; do
 
     app_name="${wm_class##*.}"
 
-    windows+=( "${id} - ${app_name} - ${window_title}" )
+    if [ "${#app_name}" -ge 20 ]; then
+        app_name="${app_name:0:17}..."
+    fi
+
+    windows+=( "${window_title} - ${app_name} - ${id}" )
 
 done < <(wmctrl -lx | sort -k 2)
 
-read dmenu_selection _ < <(dmenu_wrapper 'Select window:' < <(printf '%s\n' "${windows[@]}"))
-
+read dmenu_selection < <(dmenu_wrapper 'Select window:' < <(printf '%s\n' "${windows[@]}"))
+dmenu_selection="${dmenu_selection##* - }"
 
 case "${dmenu_selection}" in
     '0x'*)
