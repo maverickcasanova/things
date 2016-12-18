@@ -46,7 +46,7 @@ while read id desktop wm_class hostname window_title; do
         app_name="${app_name:0:17}..."
     fi
 
-    printf -v i_wanna_sprintf "%-104s %s" "${window_title} - ${app_name}" "${id}"
+    printf -v i_wanna_sprintf "%-128s %s" "${window_title} - ${app_name}" "${id}"
 
     windows+=( "${i_wanna_sprintf}" )
 
