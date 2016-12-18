@@ -55,6 +55,10 @@ dmenu_selection="${dmenu_selection##* - }"
 
 case "${dmenu_selection}" in
     '0x'*)
+        # Running wmctrl twice as a workaround. 
+        # Sometimes after putting window to front it fails 
+        # to set it to active.
+        wmctrl -ia "${dmenu_selection}"
         wmctrl -ia "${dmenu_selection}"
     ;;
 esac
