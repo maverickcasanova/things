@@ -40,7 +40,7 @@ while read id desktop wm_class hostname window_title; do
         continue
     fi
 
-    app_name="${wm_class#*.}"
+    app_name="${wm_class##*.}"
 
     windows+=( "${id} - ${app_name} - ${window_title}" )
 
