@@ -1,0 +1,117 @@
+#!/usr/bin/env perl
+
+# rr - rename tool
+# Mass rename made easy, with optional perl expressions.
+#
+# Options:
+#   --lower, -l                    Convert names to lower case.
+#   --underscore, -u               Convert spaces into underscores.
+#   --perlexpr <expr>, -e <expr>   Use perl expression to transfom string.
+#                                  Can be specified multiple times.
+#   --recursive, -r                Travel directories recursively.
+#   --dry-run, -n                  Don't rename anything, just print.
+#   --help, -h                     Help.
+#
+# Usage:
+#
+#   Convert upper into lower case and replace spaces with underscores. Recursively.
+#       rr -lur ~/music
+#
+#   Convert spaces to underscore for files/dirs specified as arguments
+#       rr -u file1 /mnt/dropzone/dir1 /tmp/foo
+#           - or -
+#       rr -e 's/ /_/g' file1 /mnt/dropzone/dir1 /tmp/foo
+#
+#   Replace 'jpeg' with 'jpg' and 'IMG' with 'Photo' on all files inside directory.
+#       rr -e 's/jpeg/jpg/' -e 's/IMG/Photo/g' /media/foo/*
+#
+#   Remove a year from names, so "foo (2015) baz" and "bar_(1999)_yep" become "foo baz" and "bar_yep"
+#       rr -e 's/\([0-9]{4}\)( |_)//g' dir/*
+
+use strict;
+use warnings;
+
+use File::Find qw/ find /;
+use File::Basename qw/ dirname basename /;
+use Cwd qw/ abs_path /;
+
+use Getopt::Long;
+Getopt::Long::Configure ("bundling");
+
+my $VERSION = "0.1-git";
+
+use autodie qw/ :all /;
+
+use Data::Dumper;
+
+
+my ($recursive, $to_lower, $to_underscore, @perlexpr, $dryrun, $help);
+
+sub help {
+    printf "%s %s\n", "rr", $VERSION;
+    exit(1);
+}
+
+GetOptions (
+    'lower|l' => \$to_lower,
+    'underscore|u' => \$to_underscore,
+    'recursive|r' => \$recursive,
+    'perlexpr|e=s' => \@perlexpr,
+    'dry-run|n' => \$dryrun,
+    'help|h' => \$help,
+
+) or help;
+
+help if $help;
+help if not @ARGV;
+
+for (@ARGV) {
+    my @paths;
+
+    my $abs_path = abs_path($_);
+    chdir(dirname($abs_path));
+
+    my $basename = basename($abs_path);
+
+    if ($recursive) {
+        find({ wanted => sub { push(@paths, $File::Find::name) }, follow_skip => 2}, $basename);
+    } else {
+        push(@paths, $basename);
+    }
+
+    for (reverse @paths) {
+        my $path = $_;
+        my $basename = basename($path);
+        my $dirname = dirname($path);;
+
+        my $new = $basename;
+ 
+        if (@perlexpr) {
+	        for (@perlexpr) { 
+                # WHAT COULD GO WRONG?!
+	            my $perlexpr = "\$new =~ " . $_;
+	            {
+	                no strict;
+	                eval $perlexpr;
+	            }
+	            die $@ if $@;
+            }
+        }
+
+        if ($to_lower) {
+            $new = lc($new);
+        }
+
+        if ($to_underscore) {
+            $new =~ s/ /_/g;
+        }
+
+        next if $new eq $basename;
+        
+        print "[rr] >>> $dirname/$basename -> $dirname/$new\n";
+
+        if (not $dryrun) {
+            rename("$dirname/$basename", "$dirname/$new");
+        }
+    }
+}
