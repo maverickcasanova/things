@@ -1,6 +1,8 @@
 #!/usr/bin/env perl
+# Copyright (c) 2017, Piotr Karbowski <piotr.karbowski@gmail.com>
 
-# rr - rename tool
+# rr - a fancy rename tool.
+#
 # Mass rename made easy, with optional perl expressions.
 #
 # Options:
@@ -42,13 +44,40 @@ my $VERSION = "0.1-git";
 
 use autodie qw/ :all /;
 
-use Data::Dumper;
-
-
 my ($recursive, $to_lower, $to_underscore, @perlexpr, $dryrun, $help);
 
 sub help {
-    printf "%s %s\n", "rr", $VERSION;
+    print <<'END';
+rr - a fancy rename tool.
+
+Mass rename made easy, with optional perl expressions.
+
+Options:
+  --lower, -l                    Convert names to lower case.
+  --underscore, -u               Convert spaces into underscores.
+  --perlexpr <expr>, -e <expr>   Use perl expression to transfom string.
+                                  Can be specified multiple times.
+  --recursive, -r                Travel directories recursively.
+  --dry-run, -n                  Don't rename anything, just print.
+  --help, -h                     Help.
+
+Usage:
+
+  Convert upper into lower case and replace spaces with underscores. Recursively.
+      rr -lur ~/music
+
+  Convert spaces to underscore for files/dirs specified as arguments
+      rr -u file1 /mnt/dropzone/dir1 /tmp/foo
+          - or -
+      rr -e 's/ /_/g' file1 /mnt/dropzone/dir1 /tmp/foo
+
+  Replace 'jpeg' with 'jpg' and 'IMG' with 'Photo' on all files inside directory.
+      rr -e 's/jpeg/jpg/' -e 's/IMG/Photo/g' /media/foo/*
+
+   Remove a year from names, so "foo (2015) baz" and "bar_(1999)_yep" become "foo baz" and "bar_yep"
+      rr -e 's/\([0-9]{4}\)( |_)//g' dir/*
+
+END
     exit(1);
 }
 
@@ -87,14 +116,14 @@ for (@ARGV) {
         my $new = $basename;
  
         if (@perlexpr) {
-	        for (@perlexpr) { 
+            for (@perlexpr) { 
                 # WHAT COULD GO WRONG?!
-	            my $perlexpr = "\$new =~ " . $_;
-	            {
-	                no strict;
-	                eval $perlexpr;
-	            }
-	            die $@ if $@;
+                my $perlexpr = "\$new =~ " . $_;
+                {
+                    no strict;
+                    eval $perlexpr;
+                }
+                die $@ if $@;
             }
         }
 
