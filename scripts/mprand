@@ -60,9 +60,9 @@ sub preload {
 
 find({ wanted => \&queue, follow => 1}, $cwd);
 
-@randomized_files = shuffle(@files);
-
 while (1) {
+    @randomized_files = shuffle(@files);
+
     # C-style loop to be able to easily lookup next item (for preload).
     for (my $i = 0; $i < @randomized_files; $i++) {
         my $file = $randomized_files[$i];
