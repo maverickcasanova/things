@@ -1,11 +1,12 @@
 #!/usr/bin/env perl
 # Copyright (c) 2017, Piotr Karbowski <piotr.karbowski@gmail.com>
-
+#
 # rr - a fancy rename tool.
 #
 # Mass rename made easy, with optional perl expressions.
 #
 # Options:
+#
 #   --lower, -l                    Convert names to lower case.
 #   --underscore, -u               Convert spaces into underscores.
 #   --perlexpr <expr>, -e <expr>   Use perl expression to transfom string.
@@ -53,10 +54,11 @@ rr - a fancy rename tool.
 Mass rename made easy, with optional perl expressions.
 
 Options:
+
   --lower, -l                    Convert names to lower case.
   --underscore, -u               Convert spaces into underscores.
   --perlexpr <expr>, -e <expr>   Use perl expression to transfom string.
-                                  Can be specified multiple times.
+                                 Can be specified multiple times.
   --recursive, -r                Travel directories recursively.
   --dry-run, -n                  Don't rename anything, just print.
   --help, -h                     Help.
