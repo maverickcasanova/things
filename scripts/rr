@@ -97,7 +97,7 @@ help if not @ARGV;
 for (@ARGV) {
     my @paths;
 
-    die "[error] >>> The '$_' does not exist.\n"  if not -e;
+    die "[error] >>> $_: $!\n"  if not -e;
 
     my $abs_path = abs_path($_);
     chdir(dirname($abs_path));
