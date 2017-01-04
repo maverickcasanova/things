@@ -41,8 +41,6 @@ use Cwd qw/ abs_path /;
 use Getopt::Long;
 Getopt::Long::Configure ("bundling");
 
-my $VERSION = "0.1-git";
-
 use autodie qw/ :all /;
 
 my ($recursive, $to_lower, $to_underscore, @perlexpr, $dryrun, $help);
@@ -99,6 +97,8 @@ help if not @ARGV;
 for (@ARGV) {
     my @paths;
 
+    die "[error] >>> The '$_' does not exist.\n"  if not -e;
+
     my $abs_path = abs_path($_);
     chdir(dirname($abs_path));
 
@@ -107,7 +107,6 @@ for (@ARGV) {
     if ($recursive) {
         find({ wanted => sub { push(@paths, $File::Find::name) }, follow_skip => 2}, $basename);
     } else {
-        push(@paths, $basename);
     }
 
     for (reverse @paths) {
@@ -138,8 +137,10 @@ for (@ARGV) {
         }
 
         next if $new eq $basename;
-        
+
         print "[rr] >>> $dirname/$basename -> $dirname/$new\n";
+
+        die "[error] >>> Target already exist.\n" if -e "$dirname/$new";
 
         if (not $dryrun) {
             rename("$dirname/$basename", "$dirname/$new");
