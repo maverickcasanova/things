@@ -111,17 +111,19 @@ for (@real_paths) {
     if ($recursive) {
         find({ wanted => sub { push(@paths, $File::Find::name) }, follow_skip => 2}, $basename);
     } else {
+        push(@paths, $basename);
     }
 
-    for (reverse @paths) {
-        my $path = $_;
+    for (my $i = $#paths; $i > 1; $i--) {
+        my $path = $paths[$i];
+
         my $basename = basename($path);
         my $dirname = dirname($path);;
 
         my $new = $basename;
- 
+
         if (@perlexpr) {
-            for (@perlexpr) { 
+            for (@perlexpr) {
                 # WHAT COULD GO WRONG?!
                 my $perlexpr = "\$new =~ " . $_;
                 {
