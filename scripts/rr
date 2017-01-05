@@ -35,8 +35,7 @@ use strict;
 use warnings;
 
 use File::Find qw/ find /;
-use File::Basename qw/ dirname basename /;
-use Cwd qw/ abs_path /;
+use File::Basename qw/ fileparse /;
 
 use Getopt::Long;
 Getopt::Long::Configure ("bundling");
@@ -94,38 +93,26 @@ GetOptions (
 help if $help;
 help if not @ARGV;
 
-my @real_paths;
+
 for (@ARGV) {
     die "[error] >>> $_: $!\n"  if not -e;
 
-    push(@real_paths, abs_path($_));
-}
-
-for (@real_paths) {
     my @paths;
-
-    chdir(dirname($_));
-
-    my $basename = basename($_);
-
     if ($recursive) {
-        find({ wanted => sub { push(@paths, $File::Find::name) }, follow_skip => 2}, $basename);
+        find({ wanted => sub { push(@paths, $File::Find::name) }, follow => 0}, $_);
     } else {
-        push(@paths, $basename);
+        push(@paths, $_);
     }
 
-    for (my $i = $#paths; $i > 1; $i--) {
-        my $path = $paths[$i];
-
-        my $basename = basename($path);
-        my $dirname = dirname($path);;
-
+    for (my $i = $#paths; $i >= 1; $i--) {
+        my $old_path = $paths[$i];
+        my ($basename, $dirname) = fileparse($old_path);
         my $new = $basename;
 
         if (@perlexpr) {
             for (@perlexpr) {
                 # WHAT COULD GO WRONG?!
-                my $perlexpr = "\$new =~ " . $_;
+                my $perlexpr = '$new =~ ' . $_;
                 {
                     no strict;
                     eval $perlexpr;
@@ -144,12 +131,14 @@ for (@real_paths) {
 
         next if $new eq $basename;
 
-        print "[rr] >>> $dirname/$basename -> $dirname/$new\n";
+        my $new_path = $dirname . $new;
 
-        die "[error] >>> Target already exist.\n" if -e "$dirname/$new";
+        print "[rr] >>> $old_path -> $new_path\n";
+
+        die "[error] >>> Target already exist.\n" if -e $new_path;
 
         if (not $dryrun) {
-            rename("$dirname/$basename", "$dirname/$new");
+            rename($old_path, $new_path);
         }
     }
 }
