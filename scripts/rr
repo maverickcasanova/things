@@ -94,15 +94,19 @@ GetOptions (
 help if $help;
 help if not @ARGV;
 
+my @real_paths;
 for (@ARGV) {
-    my @paths;
-
     die "[error] >>> $_: $!\n"  if not -e;
 
-    my $abs_path = abs_path($_);
-    chdir(dirname($abs_path));
+    push(@real_paths, abs_path($_));
+}
 
-    my $basename = basename($abs_path);
+for (@real_paths) {
+    my @paths;
+
+    chdir(dirname($_));
+
+    my $basename = basename($_);
 
     if ($recursive) {
         find({ wanted => sub { push(@paths, $File::Find::name) }, follow_skip => 2}, $basename);
