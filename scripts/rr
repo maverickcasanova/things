@@ -31,10 +31,13 @@
 #   Remove a year from names, so "foo (2015) baz" and "bar_(1999)_yep" become "foo baz" and "bar_yep"
 #       rr -e 's/\([0-9]{4}\)( |_)//g' dir/*
 
+# todo:
+# - Don't use eval, parse -e instead, split by / to get search, replace and optional flags.
+
 use strict;
 use warnings;
 
-use File::Find qw/ find /;
+use File::Find qw/ finddepth /;
 use File::Basename qw/ fileparse /;
 
 use Getopt::Long;
@@ -94,7 +97,13 @@ help if $help;
 help if not @ARGV;
 
 sub bump_name {
-        my $old_path = $Find::File::name ? $Find::File::name : $_;
+        my $old_path = $File::Find::name ? $File::Find::name : $_;
+
+        # To handle like a boss the 'rr -r -<...> .', 
+        # to not even try to rename current working directory.
+        # thought we could load Cwd's abs_path during runtime
+        # and rename current working directory anyway.
+        return if $old_path eq '.';
 
         my ($basename, $dirname) = fileparse($old_path);
         my $new = $basename;
@@ -119,7 +128,7 @@ sub bump_name {
             $new =~ s/ /_/g;
         }
 
-        next if $new eq $basename;
+        return if $new eq $basename;
 
         my $new_path = $dirname . $new;
 
@@ -130,7 +139,6 @@ sub bump_name {
         if (not $dryrun) {
             rename($old_path, $new_path);
         }
-
 }
 
 for (@ARGV) {
@@ -138,7 +146,7 @@ for (@ARGV) {
 
     my @paths;
     if ($recursive) {
-        find({ wanted => \&bump_name, follow => 0}, $_);
+        finddepth({ wanted => \&bump_name, follow => 0, no_chdir => 1}, $_);
     } else {
         bump_name($_);
     }
