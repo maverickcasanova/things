@@ -33,6 +33,7 @@
 
 # todo:
 # - Don't use eval, parse -e instead, split by / to get search, replace and optional flags.
+# - A switch to work on dirs-only and files-only.
 
 use strict;
 use warnings;
