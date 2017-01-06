@@ -93,19 +93,9 @@ GetOptions (
 help if $help;
 help if not @ARGV;
 
+sub bump_name {
+        my $old_path = $Find::File::name ? $Find::File::name : $_;
 
-for (@ARGV) {
-    die "[error] >>> $_: $!\n"  if not -e;
-
-    my @paths;
-    if ($recursive) {
-        find({ wanted => sub { push(@paths, $File::Find::name) }, follow => 0}, $_);
-    } else {
-        push(@paths, $_);
-    }
-
-    for (my $i = $#paths; $i >= 1; $i--) {
-        my $old_path = $paths[$i];
         my ($basename, $dirname) = fileparse($old_path);
         my $new = $basename;
 
@@ -140,5 +130,16 @@ for (@ARGV) {
         if (not $dryrun) {
             rename($old_path, $new_path);
         }
+
+}
+
+for (@ARGV) {
+    die "[error] >>> $_: $!\n"  if not -e;
+
+    my @paths;
+    if ($recursive) {
+        find({ wanted => \&bump_name, follow => 0}, $_);
+    } else {
+        bump_name($_);
     }
 }
