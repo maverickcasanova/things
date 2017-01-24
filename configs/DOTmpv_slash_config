@@ -28,7 +28,10 @@ sub-back-color="#80000000"
 sub-border-size=0.0
 
 alang=jpn
+slang=eng
 
 no-resume-playback
 
 geometry=50%:50%
+
+ytdl-format=best[height<=720]
