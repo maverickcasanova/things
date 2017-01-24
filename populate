@@ -24,5 +24,6 @@ update ~/.gitconfig configs/DOTgitconfig && sed -r 's#(name|email) =.*#\1 = NULL
 update ~/.mpv/config configs/DOTmpv_slash_config
 update ~/.xmodmap configs/DOTxmodmap
 update ~/.config/user-dirs.dirs configs/user-dirs.dirs
+update ~/.config/dunstrc configs/DOTconfig_dunstrc
 
 git status --porcelain
