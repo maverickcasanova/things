@@ -1,0 +1,89 @@
+#!/usr/bin/env perl
+
+# Damn simple /etc/portage/package.use helper.
+# Supports listing, adding and removing flags.
+# Additionally sorts and remove duplicates.
+# Does not support package.use as a directory.
+#
+# Usage:
+#   puse 'x11-*/*' X sdl
+#   puse
+#   puse x11-wm/openbox
+#   puse app-admin/conky truetype lua -portmon
+
+use strict;
+use warnings;
+use Fcntl qw/ :flock /;
+use autodie qw/ :all /;
+
+my %package_use_content;
+
+my $package_use_file = "/etc/portage/package.use";
+
+my $lock_file = "$package_use_file.puse.lock";
+open(my $lock, '>', $lock_file);
+flock($lock, LOCK_EX);
+
+open(my $file, '<', $package_use_file );
+while(<$file>) {
+    chomp;
+    my ($name, @flags) = split(/\s+/, $_);
+    
+    for (@flags) {
+        $package_use_content{$name}{$_}++;
+    }
+}
+close($file);
+
+sub dump_package_use {
+    my $name = shift;
+    my @output;
+
+    if ($name) {
+        my @flags = sort keys %{$package_use_content{$name}};
+        push(@output, "$name @flags");
+    } else {
+        for (sort keys %package_use_content) {
+            my @flags = sort keys %{$package_use_content{$_}};
+            push(@output, "$_ @flags");
+        }
+    }
+
+    return @output;
+}
+
+my $ARGC = @ARGV;
+
+if ($ARGC == 0) {
+    print "$_\n" for dump_package_use;
+} elsif ($ARGC == 1) {
+    print "$_\n" for dump_package_use($ARGV[0]);
+} elsif ($ARGC >= 2) {
+    my $name = shift @ARGV;
+    for (@ARGV) {
+        my $first_char = substr($_, 0, 1);
+        my $flag = substr($_, 1, length($_));
+
+        if ($first_char eq '+') {
+            delete $package_use_content{$name}{'-' . $flag};
+            $package_use_content{$name}{$flag}++;
+        } elsif ($first_char eq '-') {
+            delete $package_use_content{$name}{$flag};
+            $package_use_content{$name}{'-' . $flag}++;
+        } else {
+            die "Prefix the flag either with + or -\n";
+        }
+
+        my $tmp_file = "$package_use_file.new.tmp";
+        unlink $tmp_file if -f $tmp_file;
+
+        open(my $file, '>>', $tmp_file );
+        print $file "$_\n" for dump_package_use;
+        close($file);
+
+        rename($tmp_file, $package_use_file);
+    }
+}
+
+unlink($lock_file);
+close($lock);
