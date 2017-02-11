@@ -13,7 +13,7 @@ autofit=800
 cache=131072
 
 # usb dac....
-audio-format=s16
+#audio-format=s16
 
 # most .txt are in cp1250
 sub-codepage=cp1250
@@ -22,8 +22,9 @@ sub-pos=97
 
 # OSD font settings.
 sub-ass=no
-sub-font="Arial Black"
-sub-font-size=52
+sub-font="Alte Haas Grotesk"
+sub-bold=yes
+sub-font-size=48
 sub-back-color="#80000000"
 sub-border-size=0.0
 
@@ -35,3 +36,5 @@ no-resume-playback
 geometry=50%:50%
 
 ytdl-format=best[height<=720]
+
+screenshot-format=png
