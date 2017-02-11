@@ -1,6 +1,35 @@
 #!/bin/bash
 
-# Geenrate ~/.asoundrc with specified card as default.
+# Write ~/.asoundrc with specified card as default.
+# and mute all other cards.
+
+for i in dmenu; do
+    if ! command -v "$i" >/dev/null 2>&1; then
+        die "Missing binary '$i'."
+    fi
+done
+
+mute_unmute() {
+    local action="$1"
+    local card="$2"
+
+    if amixer -c "${card}" sget Master >/dev/null 2>&1; then
+        control='Master'
+    elif amixer -c "${card}" sget PCM >/dev/null 2>&1; then
+        control='PCM'
+    else
+        return 1
+    fi
+
+    case "${action}" in
+        'mute')
+            amixer -c "${card}" -q set "${control}" mute
+        ;;
+        'unmute')
+            amixer -c "${card}" -q set "${control}" unmute
+        ;;
+    esac
+}
 
 dmenu_wrapper() {
     # A magic to position dmenu in the middle of screen.
@@ -16,12 +45,6 @@ dmenu_wrapper() {
         -sb '#a13d12' \
         -p "$*"
 }
-
-for i in dmenu; do
-    if ! command -v "$i" >/dev/null 2>&1; then
-        die "Missing binary '$i'."
-    fi
-done
 
 cards() {
     awk -f - /proc/asound/cards <<-'END'
@@ -45,3 +68,12 @@ cat > ~/.asoundrc <<EOF
 defaults.pcm.!card ${dmenu_selection}; 
 defaults.ctl.!card ${dmenu_selection};
 EOF
+
+while read -r card; do
+    card="${card##* }"
+    if [ "${card}" = "${dmenu_selection}" ]; then
+        mute_unmute unmute "${card}"
+    else
+        mute_unmute mute "${card}"
+    fi
+done < <(cards)
