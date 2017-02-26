@@ -21,5 +21,7 @@ urxvt*termName: rxvt-256color
 *.foreground:  #eee
 *.background:  #000
 
+*color1: OrangeRed
+*color4: CornflowerBlue
 *color12: #729FCF
 
