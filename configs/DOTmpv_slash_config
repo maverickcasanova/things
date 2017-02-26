@@ -2,8 +2,7 @@ vo=opengl
 video-sync=display-resample
 
 interpolation
-tscale=oversample
-dscale=mitchell
+#tscale=mitchell
 
 ao=alsa
 
