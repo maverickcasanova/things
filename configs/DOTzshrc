@@ -145,12 +145,8 @@ poweroff() { confirm_wrapper --root $0 "$@"; }
 reboot() { confirm_wrapper --root $0 "$@"; }
 hibernate() { confirm_wrapper --root $0 "$@"; }
 
-detox() {
-    if [ "$#" -ge 1 ]; then
-        confirm detox "$@"
-    else    
-        command detox "$@"
-    fi
+startx() {
+    exec =startx
 }
 
 has() {
