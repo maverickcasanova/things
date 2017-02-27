@@ -1,0 +1,28 @@
+#!/bin/bash
+# Quick and dirty s2dram wrapper.
+
+einfo() { printf ">>> %s\n" "$*"; }
+
+sync
+
+if command -v wicd-cli > /dev/null 2>&1; then
+	einfo "Disconnecting wifi ..."
+	wicd-cli --wireless --disconnect > /dev/null
+	while true; do
+		if ! wicd-cli --wireless --network-details >/dev/null 2>&1; then
+			break
+		else
+			sleep 1
+		fi
+	done
+fi
+
+einfo "Suspending to ram ..."
+echo mem > /sys/power/state
+
+if [ -f '/usr/share/wicd/daemon/autoconnect.py' ]; then
+	einfo 'Poking wicd to autoconnect.'
+	command -v wicd-cli >/dev/null 2>&1 && wicd-cli --wireless --scan
+	python2 /usr/share/wicd/daemon/autoconnect.py
+fi
+
