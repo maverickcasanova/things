@@ -1,0 +1,49 @@
+#!/usr/bin/env perl
+
+# Query freegeoip.net, to simplify redshift configuration.
+
+use warnings;
+use strict;
+use autodie qw / :all /;
+use LWP::UserAgent;
+
+
+sub fetch {
+    my $url = shift;
+    my $ua = LWP::UserAgent->new;
+    $ua->ssl_opts(
+        verify_hostname => 0,
+        SSL_verify_mode => 0x00
+    );
+    my $response = $ua->get( $url, 'Accept-Encoding' => 'gzip' );
+
+    if ( $response->is_success ) {
+        return $response->decoded_content;
+    } else {
+        die $response->status_line;
+    }
+}
+
+
+my (
+    $ip,
+    $country_code, $country_name,
+    $region_code, $region_name,
+    $city, $zip_code,
+    $time_zone, 
+    $latitude, 
+    $longitude
+) = split(/,/, fetch('https://freegeoip.net/csv/'));
+
+binmode(STDOUT, ':utf8' );
+
+printf("ip=%s\n", $ip);
+printf("country_code=%s\n", $country_code);
+printf("country_name=%s\n", $country_name);
+printf("region_code=%s\n", $region_code);
+printf("region_name=%s\n", $region_name);
+printf("city=%s\n", $city);
+printf("zip_code=%s\n", $zip_code);
+printf("time_zone=%s\n", $time_zone);
+printf("latitude=%.3f\n", $latitude);
+printf("longitude=%.3f\n", $longitude);
