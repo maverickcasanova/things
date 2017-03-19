@@ -11,10 +11,6 @@ use LWP::UserAgent;
 sub fetch {
     my $url = shift;
     my $ua = LWP::UserAgent->new;
-    $ua->ssl_opts(
-        verify_hostname => 0,
-        SSL_verify_mode => 0x00
-    );
     my $response = $ua->get( $url, 'Accept-Encoding' => 'gzip' );
 
     if ( $response->is_success ) {
