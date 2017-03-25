@@ -23,7 +23,7 @@ my @files_to_preload;
 
 sub preload_file {
     printf("Preloading %s ...\n", $_);
-    open(my $fh, "<", $_);
+    open(my $fh, "<:unix", $_);
     read($fh, $content, 1024*1024*${size}) or die;
     undef($content);
     close($fh);
