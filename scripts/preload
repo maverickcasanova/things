@@ -1,5 +1,11 @@
 #!/usr/bin/env perl
 
+# Script to preload into memory (partially) specified files.
+#
+# Poor's man e4rat:
+#     lsof | awk '$NF ~ /^\/(usr\/|)(bin|lib|lib64)\// { print $NF }' | sort -u > /root/startup_files
+#     preload -l /root/startup_files >/dev/null &
+
 use strict;
 use warnings;
 
