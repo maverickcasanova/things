@@ -1,23 +1,58 @@
 #!/usr/bin/env perl
 
-# Preload first $preload_up_to megabytes of specified files into page caches.
-
 use strict;
 use warnings;
 
-my $max_processes = 5;
-my $preload_up_to = 10;
+use Getopt::Long;
+use autodie qw/ :all /;
 
-my $fh;
+
 my $content;
+my $size = 10;
+my $jobs = 1;
+my $list_file;
+my $help;
+my @files_to_preload;
+
 
 sub preload_file {
     printf("Preloading %s ...\n", $_);
-    open($fh, "<", $_) or die;
-    read($fh, $content, 1024*1024*${preload_up_to}) or die;
+    open(my $fh, "<", $_);
+    read($fh, $content, 1024*1024*${size}) or die;
     undef($content);
-    close($fh) or die;
+    close($fh);
 }
+
+
+sub help {
+    print <<"END";
+preload - load (partialy) files into memory.
+
+Example:
+    preload -s 20 ~/video/amv/*
+    preload -j 2 -s 1 -l /root/startup_files
+
+Options:
+    --size, -s <int>       - Load <int> MB of each file. Default $size MB.
+    --jobs, -j <int>       - Run N jobs in parallel, Default $jobs. Works only 
+                             if Parallel::ForkManager is available, otherwise 
+                             falls back to 1.
+    --list-file, -l <path> - Read paths to preload from file. If not specified,
+                             Non-option arguments will be treated as files.
+    --help, -h             - This messages.
+END
+}
+
+
+GetOptions (
+    'size|s=i'      => \$size,
+    'jobs|j=i'      => \$jobs,
+    'list-file|l=s' => \$list_file,
+    'help|h'        => \$help,
+) or help;
+help if $help;
+help if not (@ARGV or $list_file);
+
 
 my $fm_is_avalabile = eval {
     require Parallel::ForkManager;
@@ -25,11 +60,21 @@ my $fm_is_avalabile = eval {
     1
 };
 
-if ($fm_is_avalabile) {
-    my $fm = new Parallel::ForkManager($max_processes);
+
+if ($list_file) {
+    open(my $fh, '<', $list_file);
+    chomp(@files_to_preload = <$fh>);
+    close($fh);
+} else {
+    @files_to_preload = @ARGV; 
+}
+
+
+if ($fm_is_avalabile and $jobs > 1) {
+    my $fm = new Parallel::ForkManager($jobs);
     $fm->set_waitpid_blocking_sleep(0);
 
-    for (@ARGV) {
+    for (@files_to_preload) {
         next if not -f;
         next if not -s;
 
@@ -42,7 +87,7 @@ if ($fm_is_avalabile) {
 
     $fm->wait_all_children
 } else {
-    for (@ARGV) {
+    for (@files_to_preload) {
         next if not -f;
         next if not -s;
 
