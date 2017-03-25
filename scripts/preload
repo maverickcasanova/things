@@ -47,6 +47,8 @@ Options:
                              Non-option arguments will be treated as files.
     --help, -h             - This messages.
 END
+
+    exit(1);
 }
 
 
