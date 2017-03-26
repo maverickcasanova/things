@@ -36,13 +36,10 @@ preload - load (partialy) files into memory.
 
 Example:
     preload -s 20 ~/video/amv/*
-    preload -j 2 -s 1 -l /root/startup_files
+    preload -l /root/startup_files
 
 Options:
     --size, -s <int>       - Load <int> MB of each file. Default $size MB.
-    --jobs, -j <int>       - Run N jobs in parallel, Default $jobs. Works only 
-                             if Parallel::ForkManager is available, otherwise 
-                             falls back to 1.
     --list-file, -l <path> - Read paths to preload from file. If not specified,
                              Non-option arguments will be treated as files.
     --help, -h             - This messages.
@@ -54,19 +51,11 @@ END
 
 GetOptions (
     'size|s=i'      => \$size,
-    'jobs|j=i'      => \$jobs,
     'list-file|l=s' => \$list_file,
     'help|h'        => \$help,
 ) or help;
 help if $help;
 help if not (@ARGV or $list_file);
-
-
-my $fm_is_avalabile = eval {
-    require Parallel::ForkManager;
-    Parallel::ForkManager->import;
-    1
-};
 
 
 if ($list_file) {
@@ -78,27 +67,9 @@ if ($list_file) {
 }
 
 
-if ($fm_is_avalabile and $jobs > 1) {
-    my $fm = new Parallel::ForkManager($jobs);
-    $fm->set_waitpid_blocking_sleep(0);
+for (@files_to_preload) {
+    next if not -f;
+    next if not -s;
 
-    for (@files_to_preload) {
-        next if not -f;
-        next if not -s;
-
-        $fm->start and next;
-
-        preload_file($_);
-        
-        $fm->finish;
-    }
-
-    $fm->wait_all_children
-} else {
-    for (@files_to_preload) {
-        next if not -f;
-        next if not -s;
-
-        preload_file($_);
-    }
-};
+    preload_file($_);
+}
