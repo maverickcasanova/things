@@ -22,6 +22,7 @@ sub-pos=97
 # OSD font settings.
 sub-ass=no
 sub-font="Alte Haas Grotesk"
+sub-color='#EEEEEE'
 sub-bold=yes
 sub-font-size=48
 sub-back-color="#80000000"
