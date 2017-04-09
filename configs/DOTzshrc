@@ -192,22 +192,6 @@ termtitle() {
     esac
 }
 
-sshkeys() {
-    # Quick and dirty solution to push list of ssh keys to fzy,
-    # to simplify the ssh user@host -i `sshkeys`
-    
-    local key
-    local keys_stash="${HOME}/.ssh/keys"
-
-    if ! command -v fzy >/dev/null 2>&1; then
-        echo >&2 'No fzy available :<'
-        return 1
-    fi
-
-    read key < <(for i in "${keys_stash}"/**/*~*.pub; do test -f "$i" && echo ${i#${keys_stash}/}; done | fzy)
-    echo "${keys_stash}/${key}"
-}
-
 git_check_if_worktree() {
     # This function intend to be only executed in chpwd().
     # Check if the current path is in git repo. 
