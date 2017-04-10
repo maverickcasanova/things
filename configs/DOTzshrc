@@ -412,7 +412,7 @@ _select_path_with_fzy() {
         return 1
     fi
     echo
-    selected_path="$(find -L * | fzy -l $(( LINES - 2 )))"
+    selected_path="$(find -L * | fzy)"
     if [ "${selected_path}" ]; then
         LBUFFER+="${(q)selected_path}"
     fi
