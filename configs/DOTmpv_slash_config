@@ -14,6 +14,9 @@ cache=131072
 # usb dac....
 #audio-format=s16
 
+# Reduce the 4 kHz frequency.
+af=equalizer=0:0:0:0:0:0:0:-2:0:0
+
 # most .txt are in cp1250
 sub-codepage=cp1250
 # Move subs a little up.
