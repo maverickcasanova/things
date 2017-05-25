@@ -32,9 +32,12 @@ my $fm = new Parallel::ForkManager(3);
 $fm->set_waitpid_blocking_sleep(0);
 
 sub queue {
-    if (not -f) { return; }
-    # todo: skip \.(jpeg|jpg|png|gif)$ but maybe not with regex matching.
-    push(@files, $File::Find::name)
+    # Skip non-files and files smaller than 2 MB.
+    
+    return if not -f;
+    return if (stat($File::Find::name))[7] < 2097152;
+
+    push(@files, $File::Find::name);
 }
 
 sub preload {
