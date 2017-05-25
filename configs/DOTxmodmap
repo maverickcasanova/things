@@ -38,3 +38,13 @@ keycode 90 = Insert KP_0
 keycode 91 = Delete KP_Decimal
 !keycode 112 = Prior
 !keycode 117 = Next
+
+
+! ! ✔
+keycode 10 = 1 exclam NoSymbol NoSymbol U2714
+! @ ✘
+keycode 11 = 2 at NoSymbol NoSymbol U2718
+! # 「
+keycode 12 = 3 numbersign NoSymbol NoSymbol U300C
+! $ 」
+keycode 13 = 4 dollar NoSymbol NoSymbol U300D
