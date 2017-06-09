@@ -9,7 +9,7 @@ XTerm*eightBitInput: true
 XTerm*altSendsEscape: true
 XTerm*metaSendsEscape: true
 
-*.font: xft:Terminus:style=regular:size=11:antialias=false:lang=pl,xft:Droid Sans Japanese,xft:Droid Sans Fallback
+*.font: xft:xos4 Terminus:style=regular:size=11:antialias=false:lang=pl,xft:Droid Sans Japanese,xft:Droid Sans Fallback
 
 !urxvt*color4: #0471e1
 urxvt*geometry: 90x24
