@@ -238,6 +238,11 @@ git_check_if_worktree() {
 git_branch() {
     git_branch="$(git symbolic-ref HEAD 2>/dev/null)"
     git_branch="${git_branch#refs/heads/}"
+
+    if [ "${#git_branch}" -ge 24 ]; then
+        git_branch="${git_branch:0:21}..."
+    fi
+
     git_branch="${git_branch:-no branch}"
 }
 
