@@ -8,6 +8,8 @@ ao=alsa
 
 autofit=800
 
+hwdec=auto
+
 # Bigger cache, help a lot especially with 720p/1080p etc.
 cache=131072
 
