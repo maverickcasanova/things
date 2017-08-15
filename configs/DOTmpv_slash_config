@@ -33,6 +33,9 @@ sub-font-size=48
 sub-back-color="#80000000"
 sub-border-size=0.0
 
+# margin on sub-back-color.
+sub-shadow-offset=5
+
 alang=jpn
 slang=eng
 
