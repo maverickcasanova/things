@@ -92,6 +92,11 @@ if ! [ "${dst}" ]; then
     edie 'Destination must be set'
 fi
 
+if [[ "${dst}" =~ [[:blank:]] ]]; then
+    # Not worth the effort to support it when $remote is set.
+    edie 'White chars in destination are not supported'
+fi
+
 case "${full_dst}" in
     *':'*)
         remote="${full_dst%%:*}"
