@@ -5,6 +5,10 @@
 #
 # Usage:
 #   rsnapdir ~/music user@host:dropzone/music
+#
+# To be added:
+#   - support for remote source
+#   - Use single ssh connection with ControlMaster
 
 set -e
 
