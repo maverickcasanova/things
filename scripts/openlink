@@ -1,5 +1,7 @@
 #!/usr/bin/env perl
 
+# TODO: conver special chars, like & and +
+
 use strict;
 use warnings;
 
