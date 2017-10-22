@@ -1,9 +1,7 @@
 #!/bin/bash
 
-# Wrapper around rsync and cp, with support for remote destination.
-# that do up to 3 snapshots of destination prior to syncing it with source directory.
-#
-# the snapshots are hardlink-based.
+# Simple (and rather limited) script to sync local directory to another (remote) location
+# keeping up to 3 old version on destination with hardlink-based snapshots.
 #
 # First argument is source directory.
 # Second argument is destination, local or remote.
@@ -13,6 +11,7 @@
 #   rsnapdir <source_dir> [remote:]<destination_dir>
 #   rsnapdir ~/music user@host:dropzone/music
 #   rsnapdir ~/backups foo@bar:backups --bwlimit 500
+#   rsnapdir . /media/sdb1/home-backup
 #
 # To be added:
 #   - support for remote source
