@@ -1,0 +1,96 @@
+#!/bin/bash
+
+# Wrapper around rsync and cp, with support for remote destination.
+# that do up to 3 snapshots of destination prior to syncing it with source directory.
+#
+# Usage:
+#   rsnapdir ~/music user@host:dropzone/music
+
+set -e
+
+eerror() {
+    echo ">>> [ERROR] $*" >&2
+}
+
+einfo() {
+    echo ">>> [INFO] $*"
+}
+
+edie() {
+    eerror "$*"
+    exit 1
+}
+
+if ! [ "$#" = 2 ]; then
+    edie "Wrong amount of arguments."
+fi
+
+run() {
+    echo "Running $*"
+    "$@"
+}
+
+dst_run() {
+    if [ "${remote}" ]; then
+        run ssh "${remote}" "$@"
+    else
+        run "$@"
+    fi
+}
+
+snapshot_directory() {
+    dir="$1"
+
+    if dst_run test -d "${dir}-snapshot-3"; then
+        dst_run rm -rf "${dir}-snapshot-3"
+    fi
+
+    if dst_run test -d "${dir}-snapshot-2"; then
+        dst_run mv "${dir}-snapshot-2" "${dir}-snapshot-3"
+    fi
+
+    if dst_run test -d "${dir}-snapshot-1"; then
+        dst_run mv "${dir}-snapshot-1" "${dir}-snapshot-2"
+    fi
+
+    if dst_run test -d "${dir}"; then
+        dst_run cp -al "${dir}" "${dir}-snapshot-1"
+    fi
+}
+
+unset remote
+
+src="$1"
+src="$(readlink -f "${src}")"
+
+dst="$2"
+
+while [[ "${dst}" =~ /$ ]]; do
+    dst="${dst%/}"
+done
+
+full_dst="${dst}"
+
+dst="${dst#*:}"
+
+if ! [ -d "${src}" ]; then
+    edie "Source needs to be directory"
+fi
+
+if [[ "${dst}" =~ ^\.\.*$ ]]; then
+    edie "Named destination needed"
+fi
+
+if ! [ "${dst}" ]; then
+    edie 'Destination must be set'
+fi
+
+case "${full_dst}" in
+    *':'*)
+        remote="${full_dst%%:*}"
+    ;;
+esac
+
+snapshot_directory "${dst}"
+dst_run mkdir -p "${dst}"
+run rsync --delete --partial --numeric-ids -a --progress "${src}/" "${full_dst}/"
