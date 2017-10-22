@@ -3,6 +3,8 @@
 # Wrapper around rsync and cp, with support for remote destination.
 # that do up to 3 snapshots of destination prior to syncing it with source directory.
 #
+# the snapshots are hardlink-based.
+#
 # Usage:
 #   rsnapdir <source_dir> [remote:]<destination_dir>
 #   rsnapdir ~/music user@host:dropzone/music
