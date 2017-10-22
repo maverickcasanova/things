@@ -5,9 +5,14 @@
 #
 # the snapshots are hardlink-based.
 #
+# First argument is source directory.
+# Second argument is destination, local or remote.
+# Any additional argument is passed to rsync as option.
+#
 # Usage:
 #   rsnapdir <source_dir> [remote:]<destination_dir>
 #   rsnapdir ~/music user@host:dropzone/music
+#   rsnapdir ~/backups foo@bar:backups --bwlimit 500
 #
 # To be added:
 #   - support for remote source
@@ -28,7 +33,7 @@ edie() {
     exit 1
 }
 
-if ! [ "$#" = 2 ]; then
+if ! [ "$#" -ge 2 ]; then
     edie "Wrong amount of arguments."
 fi
 
@@ -103,6 +108,8 @@ case "${full_dst}" in
     ;;
 esac
 
+shift 2
+
 snapshot_directory "${dst}"
 dst_run mkdir -p "${dst}"
-run rsync --delete --partial --numeric-ids -a --progress "${src}/" "${full_dst}/"
+run rsync "$@" --delete --partial --numeric-ids -a --progress "${src}/" "${full_dst}/"
