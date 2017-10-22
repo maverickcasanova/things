@@ -84,7 +84,7 @@ if ! [ -d "${src}" ]; then
     edie "Source needs to be directory"
 fi
 
-if [[ "${dst}" =~ ^\.\.*$ ]]; then
+if [[ "${dst}" =~ ^(\.\.*|[./]+)$ ]]; then
     edie "Named destination needed"
 fi
 
