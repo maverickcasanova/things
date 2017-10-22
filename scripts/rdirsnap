@@ -4,6 +4,7 @@
 # that do up to 3 snapshots of destination prior to syncing it with source directory.
 #
 # Usage:
+#   rsnapdir <source_dir> [remote:]<destination_dir>
 #   rsnapdir ~/music user@host:dropzone/music
 #
 # To be added:
