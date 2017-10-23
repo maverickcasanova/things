@@ -94,9 +94,11 @@ if ! [ "${src}" ]; then
     edie 'Source needs to be set'
 fi
 
-if ! [ "${dst}" ] && [ "${remote}" ]; then
-    dst='.'
-elif ! [ "${dst}" ]; then
+if [[ "${dst}" =~ ^(\.\.*|[./]+)$ ]]; then
+    edie "Named destination needed"
+fi
+
+if ! [ "${dst}" ]; then
     edie 'Destination has not been set.'
 fi
 
@@ -105,7 +107,9 @@ if [[ "${dst}" =~ [[:blank:]] ]]; then
     edie 'White chars in destination are not supported'
 fi
 
-dst="$(dst_run readlink -f "${dst}")"
+while [[ "${dst}" =~ /$ ]]; do
+    dst="${dst%/}"
+done
 
 if ! [ -d "${src}" ]; then
     edie "Source needs to be directory"
