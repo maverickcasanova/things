@@ -78,7 +78,7 @@ fi
 unset remote
 
 src="$1"
-src="$(readlink -f "${src}")"
+src="$(run readlink -f "${src}")"
 
 dst="$2"
 
@@ -90,6 +90,10 @@ esac
 
 dst="${dst#*:}"
 
+if ! [ "${src}" ]; then
+    edie 'Source needs to be set'
+fi
+
 if ! [ "${dst}" ]; then
     dst='.'
 fi
@@ -99,7 +103,7 @@ if [[ "${dst}" =~ [[:blank:]] ]]; then
     edie 'White chars in destination are not supported'
 fi
 
-read -r dst < <(dst_run readlink -f "${dst}")
+dst="$(dst_run readlink -f "${dst}")"
 
 if ! [ -d "${src}" ]; then
     edie "Source needs to be directory"
