@@ -13,18 +13,24 @@
 #   rsnapdir ~/backups foo@bar:backups --bwlimit 500
 #   rsnapdir . /media/sdb1/home-backup
 #
+# Limitations:
+#   - Script will refuse to work with destination that include white chars.
+#   - Due to usage of `readlink -f` the script will not work on MacOS as-is.
+#   - To set custom ssh port, one needs to configure it in ~/.ssh/config.
+#
 # To be added:
 #   - support for remote source
 #   - Use single ssh connection with ControlMaster
+#   - Support for non-default ssh options, like port.
 
 set -e
 
 eerror() {
-    echo ">>> [ERROR] $*" >&2
+    echo "[ERROR] >>> $*" >&2
 }
 
 einfo() {
-    echo ">>> [INFO] $*"
+    echo "[INFO] >>> $*" >&2
 }
 
 edie() {
@@ -37,7 +43,7 @@ if ! [ "$#" -ge 2 ]; then
 fi
 
 run() {
-    echo "Running $*"
+    einfo "Running $*"
     "$@"
 }
 
@@ -76,24 +82,16 @@ src="$(readlink -f "${src}")"
 
 dst="$2"
 
-while [[ "${dst}" =~ /$ ]]; do
-    dst="${dst%/}"
-done
-
-full_dst="${dst}"
+case "${dst}" in
+    *':'*)
+        remote="${dst%%:*}"
+    ;;
+esac
 
 dst="${dst#*:}"
 
-if ! [ -d "${src}" ]; then
-    edie "Source needs to be directory"
-fi
-
-if [[ "${dst}" =~ ^(\.\.*|[./]+)$ ]]; then
-    edie "Named destination needed"
-fi
-
 if ! [ "${dst}" ]; then
-    edie 'Destination must be set'
+    dst='.'
 fi
 
 if [[ "${dst}" =~ [[:blank:]] ]]; then
@@ -101,14 +99,14 @@ if [[ "${dst}" =~ [[:blank:]] ]]; then
     edie 'White chars in destination are not supported'
 fi
 
-case "${full_dst}" in
-    *':'*)
-        remote="${full_dst%%:*}"
-    ;;
-esac
+read -r dst < <(dst_run readlink -f "${dst}")
+
+if ! [ -d "${src}" ]; then
+    edie "Source needs to be directory"
+fi
 
 shift 2
 
 snapshot_directory "${dst}"
 dst_run mkdir -p "${dst}"
-run rsync "$@" --delete --partial --numeric-ids -a --progress "${src}/" "${full_dst}/"
+run rsync "$@" --delete --partial --numeric-ids -a --progress "${src}/" "${remote}${remote:+:}${dst}/"
