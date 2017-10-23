@@ -94,8 +94,10 @@ if ! [ "${src}" ]; then
     edie 'Source needs to be set'
 fi
 
-if ! [ "${dst}" ]; then
+if ! [ "${dst}" ] && [ "${remote}" ]; then
     dst='.'
+elif ! [ "${dst}" ]; then
+    edie 'Destination has not been set.'
 fi
 
 if [[ "${dst}" =~ [[:blank:]] ]]; then
