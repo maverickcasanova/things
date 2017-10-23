@@ -38,10 +38,6 @@ edie() {
     exit 1
 }
 
-if ! [ "$#" -ge 2 ]; then
-    edie "Wrong amount of arguments."
-fi
-
 run() {
     einfo "Running $*"
     "$@"
@@ -74,6 +70,10 @@ snapshot_directory() {
         dst_run cp -al "${dir}" "${dir}-snapshot-1"
     fi
 }
+
+if ! [ "$#" -ge 2 ]; then
+    edie "Wrong amount of arguments."
+fi
 
 unset remote
 
