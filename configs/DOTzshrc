@@ -459,6 +459,8 @@ fi
 alias grep='grep --colour=auto'
 alias egrep='egrep --colour=auto'
 alias ls='ls --color=auto --human-readable --group-directories-first --classify'
+alias ll='ls --color=auto --human-readable --group-directories-first --classify -l'
+alias lla='ls --color=auto --human-readable --group-directories-first --classify -la'
 
 
 # Keys.
