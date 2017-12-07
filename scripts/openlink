@@ -26,8 +26,8 @@ def main():
 
     if len(clipboard.split('\n')) == 1 and clipboard.startswith(('http://', 'https://')):
         if clipboard.split('//')[1].startswith((
-            'www.youtube.com',
-            'youtube.com',
+            'www.youtube.com/watch',
+            'youtube.com/watch',
             'www.youtu.be',
             'youtu.be'
         )):
