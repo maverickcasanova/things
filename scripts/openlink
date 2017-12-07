@@ -1,29 +1,47 @@
-#!/usr/bin/env perl
+#!/usr/bin/env python3
 
-# TODO: conver special chars, like & and +
+# openlink
+# Opens youtube links in mpv (youtube-dl), and normal in firefox
+# also Google search everything else.
 
-use strict;
-use warnings;
+import subprocess
+from urllib.parse import quote
 
-#my $browser = 'firefox';
-my $browser = 'defaultbrowser';
 
-my $primary = qx/ xsel -p -o /;
+def run(params):
+    subprocess.Popen(
+        params,
+        stdin=None,
+        stdout=None,
+        stderr=None,
+        close_fds=True
+    )
 
-exit 0 if (not $primary);
 
-# Trim leading and traling whitespaces.
-$primary =~ s/^\s+//;
-$primary =~ s/\s+$//;
+def main():
+    clipboard = subprocess.check_output(['xclip', '-o']).decode('utf8').strip()
 
-# Strip leading and traling < >.
-$primary =~ s/^<(.*)>$/$1/;
+    url = None
+    mpv_url = None
 
-my $link;
-if ($primary !~ m/^(http|https):\/\//) {
-    $link = "https://encrypted.google.com/search?q=" . $primary;
-} else {
-    $link = $primary;
-}
+    if len(clipboard.split('\n')) == 1 and clipboard.startswith(('http://', 'https://')):
+        if clipboard.split('//')[1].startswith((
+            'www.youtube.com',
+            'youtube.com',
+            'www.youtu.be',
+            'youtu.be'
+        )):
+            mpv_url = clipboard
+        else:
+            url = clipboard
+    else:
+        url = 'https://encrypted.google.com/search?q={}'.format(quote(clipboard))
 
-system($browser, '--new-tab', $link);
+    if url:
+        run(['firefox', '--new-tab', url])
+    elif mpv_url:
+        run(['mpv', mpv_url])
+
+
+if __name__ == "__main__":
+    main()
