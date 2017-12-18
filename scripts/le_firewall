@@ -1,0 +1,119 @@
+#!/bin/sh
+
+# Basic firewall along with networking for Virtual Machines.
+# Best to start in boot runlevel, before any network service.
+
+### Config
+bridges='0 1 2 3 4'
+open_tcp_ports='80 443 8080 22'
+open_udp_ports=''
+respond_to_ping='true'
+###
+
+set -e
+
+# load /etc/conf.d/le_firewall config, that may override above
+if [ -f /etc/conf.d/le_firewall ]; then
+    . /etc/conf.d/le_firewall
+fi
+
+if [ "${bridges}" ] && ! [ -d /sys/module/br_netfilter ]; then
+    # br_netfilter is needed to actually limit network within bridges.
+    modprobe br_netfilter
+
+    # Enable the IPv4 forwarwding.
+    echo 1 >/proc/sys/net/ipv4/ip_forward
+fi
+
+# Purge current rules.
+iptables -F
+iptables -X
+iptables -t nat -F
+iptables -t nat -X
+iptables -t mangle -F
+iptables -t mangle -X
+iptables -P INPUT ACCEPT
+iptables -P FORWARD ACCEPT
+iptables -P OUTPUT ACCEPT
+
+# Default policy, drop incoming, allow outgoing.
+iptables -P INPUT DROP
+iptables -P FORWARD DROP
+iptables -P OUTPUT ACCEPT
+
+# Log the DROP.
+iptables -N LOGDROP
+iptables -A LOGDROP -j LOG --log-level 4 --log-prefix '[LOG DROP] '
+iptables -A LOGDROP -j DROP
+
+# Log the REJECT
+iptables -N LOGREJECT
+iptables -A LOGREJECT -j LOG --log-level 4 --log-prefix '[LOG REJECT] '
+iptables -A LOGREJECT -j REJECT
+
+# Drop junk
+iptables -A INPUT -m conntrack --ctstate INVALID -j DROP
+iptables -A FORWARD -m conntrack --ctstate INVALID -j DROP
+iptables -A OUTPUT -m conntrack --ctstate INVALID -j DROP
+
+# Don't kill already spared connections,
+# The FORWARD chain is needed for bridges.
+iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+iptables -A FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+
+# Drop bogus packets
+iptables -A INPUT -p tcp -m tcp --tcp-flags SYN,FIN SYN,FIN -j DROP
+iptables -A INPUT -p tcp -m tcp --tcp-flags SYN,RST SYN,RST -j DROP
+
+# Drop excessive RST packets to avoid SMURF attacks, by given the next real data packet in the sequence a better chance to arrive first.
+iptables -A INPUT -p tcp -m tcp --tcp-flags RST RST -m limit --limit 2/second --limit-burst 2 -j ACCEPT
+
+# Drop all outgoing traffic from wine user.
+#iptables -A OUTPUT -p tcp -m owner --uid-owner wine -j LOGREJECT
+
+# Allow all transfers on local interface
+iptables -A INPUT -i lo -j ACCEPT
+iptables -A OUTPUT -o lo -j ACCEPT
+
+# Respond to ping.
+if [ "${respond_to_ping}" = 'true' ]; then
+    iptables -A INPUT -p icmp --icmp-type 8 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
+fi
+
+# Open configured TCP ports.
+for port in ${open_tcp_ports}; do
+    iptables -A INPUT -p tcp --dport "${port}" -j ACCEPT
+done
+
+# Open configured UDP ports.
+for port in ${open_udp_ports}; do
+    iptables -A INPUT -p udp --dport "${port}" -j ACCEPT
+done
+
+# Get bridges up, br-virt0 - br-virt4.
+# and allow them to connect to VMs inside bridges (poor's man switch, in general)
+for i in ${bridges}; do
+    if ! [ -d /sys/class/net/br-virt${i} ]; then 
+    	ip link add name br-virt${i} type bridge
+	    ip link set up dev br-virt${i}
+	    ip addr add 172.30.${i}.1/24 dev br-virt${i}
+    fi
+
+    # Allow traffic within bridged devices.
+	iptables -A FORWARD -i br-virt${i} -o br-virt${i} -s 172.30.${i}.0/24 -d 172.30.${i}.0/24 -j ACCEPT
+done
+
+# Drop FORWARD to internal subnets, so VMs won't get all cozy 
+# with LAN and other bridged networks, unless allowed above.
+iptables -A FORWARD -d 10.0.0.0/8 -j LOGREJECT
+iptables -A FORWARD -d 172.16.0.0/12 -j LOGREJECT
+iptables -A FORWARD -d 192.168.0.0/16 -j LOGREJECT
+
+# Grant WAN (out-of-bridge and host) access to VMs within bridges.
+for i in ${bridges}; do
+	iptables -t nat -A POSTROUTING -s 172.30.${i}.0/24 ! -d 172.30.0.0/16 -j MASQUERADE
+	iptables -A FORWARD -i br-virt${i} -s 172.30.${i}.0/24 -j ACCEPT
+done
+
+# Be verbous when we drop something that was not allowed above already
+iptables -A FORWARD -j LOGDROP
