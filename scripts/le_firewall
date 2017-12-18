@@ -90,7 +90,7 @@ for port in ${open_udp_ports}; do
     iptables -A INPUT -p udp --dport "${port}" -j ACCEPT
 done
 
-# Get bridges up, br-virt0 - br-virt4.
+# Get bridges up.
 # and allow them to connect to VMs inside bridges (poor's man switch, in general)
 for i in ${bridges}; do
     if ! [ -d /sys/class/net/br-virt${i} ]; then 
