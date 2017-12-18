@@ -17,9 +17,11 @@ if [ -f /etc/conf.d/le_firewall ]; then
     . /etc/conf.d/le_firewall
 fi
 
-if [ "${bridges}" ] && ! [ -d /sys/module/br_netfilter ]; then
-    # br_netfilter is needed to actually limit network within bridges.
-    modprobe br_netfilter
+if [ "${bridges}" ]; then
+    if ! [ -d /sys/module/br_netfilter ]; then
+        # br_netfilter is needed to actually limit network within bridges.
+        modprobe br_netfilter
+    fi
 
     # Enable the IPv4 forwarwding.
     echo 1 >/proc/sys/net/ipv4/ip_forward
