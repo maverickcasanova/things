@@ -94,13 +94,13 @@ done
 # and allow them to connect to VMs inside bridges (poor's man switch, in general)
 for i in ${bridges}; do
     if ! [ -d /sys/class/net/br-virt${i} ]; then 
-    	ip link add name br-virt${i} type bridge
-	    ip link set up dev br-virt${i}
-	    ip addr add 172.30.${i}.1/24 dev br-virt${i}
+        ip link add name br-virt${i} type bridge
+        ip link set up dev br-virt${i}
+        ip addr add 172.30.${i}.1/24 dev br-virt${i}
     fi
 
     # Allow traffic within bridged devices.
-	iptables -A FORWARD -i br-virt${i} -o br-virt${i} -s 172.30.${i}.0/24 -d 172.30.${i}.0/24 -j ACCEPT
+    iptables -A FORWARD -i br-virt${i} -o br-virt${i} -s 172.30.${i}.0/24 -d 172.30.${i}.0/24 -j ACCEPT
 done
 
 # Drop FORWARD to internal subnets, so VMs won't get all cozy 
@@ -111,8 +111,8 @@ iptables -A FORWARD -d 192.168.0.0/16 -j LOGREJECT
 
 # Grant WAN (out-of-bridge and host) access to VMs within bridges.
 for i in ${bridges}; do
-	iptables -t nat -A POSTROUTING -s 172.30.${i}.0/24 ! -d 172.30.0.0/16 -j MASQUERADE
-	iptables -A FORWARD -i br-virt${i} -s 172.30.${i}.0/24 -j ACCEPT
+    iptables -t nat -A POSTROUTING -s 172.30.${i}.0/24 ! -d 172.30.0.0/16 -j MASQUERADE
+    iptables -A FORWARD -i br-virt${i} -s 172.30.${i}.0/24 -j ACCEPT
 done
 
 # Be verbous when we drop something that was not allowed above already
