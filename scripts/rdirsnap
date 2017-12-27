@@ -54,8 +54,16 @@ dst_run() {
 snapshot_directory() {
     dir="$1"
 
+    if dst_run test -d "${dir}-snapshot-5"; then
+        dst_run rm -rf "${dir}-snapshot-5"
+    fi
+
+    if dst_run test -d "${dir}-snapshot-4"; then
+        dst_run mv "${dir}-snapshot-4" "${dir}-snapshot-5"
+    fi
+
     if dst_run test -d "${dir}-snapshot-3"; then
-        dst_run rm -rf "${dir}-snapshot-3"
+        dst_run mv "${dir}-snapshot-3" "${dir}-snapshot-4"
     fi
 
     if dst_run test -d "${dir}-snapshot-2"; then
