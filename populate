@@ -13,7 +13,6 @@ update() {
 	fi
 }
 
-update /etc/dnsmasq.conf configs/dnsmasq.conf
 update ~/.zshrc configs/DOTzshrc
 update ~/.Xdefaults  configs/DOTXDefaults
 update ~/.config/tint2/tint2rc configs/tint2rc
