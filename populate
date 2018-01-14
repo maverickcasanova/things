@@ -13,7 +13,6 @@ update() {
 	fi
 }
 
-update ~/.zshrc configs/DOTzshrc
 update ~/.Xdefaults  configs/DOTXDefaults
 update ~/.config/tint2/tint2rc configs/tint2rc
 update ~/.tmux.conf  configs/DOTtmux.conf
