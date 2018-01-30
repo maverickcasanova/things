@@ -35,7 +35,7 @@ def main():
         else:
             url = clipboard
     else:
-        url = 'https://encrypted.google.com/search?q={}'.format(quote(clipboard))
+        url = 'https://duckduckgo.com/?q={}'.format(quote(clipboard))
 
     if url:
         run(['firefox', '--new-tab', url])
