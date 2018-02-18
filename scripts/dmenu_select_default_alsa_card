@@ -52,6 +52,7 @@ cards() {
 		    card = $1;
 			sub(/.*- /, "")
 			printf("%s %128s\n", $0, card)
+			printf("%s %128s\n", $0 " (no dmix)", card "-nodmix")
 		}
 	END
 }
@@ -64,13 +65,28 @@ if ! [ "${dmenu_selection}" ]; then
 	exit 0
 fi
 
-cat > ~/.asoundrc <<EOF
+if [[ "${dmenu_selection}" =~ -nodmix$ ]]; then
+    dmenu_selection="${dmenu_selection%%-*}"
+    cat > ~/.asoundrc <<-END
+		pcm.!default {
+		    type plug
+		    slave.pcm hw
+		}
+
+	END
+else
+    : > ~/.asoundrc
+fi
+
+
+cat >> ~/.asoundrc <<END
 defaults.pcm.!card ${dmenu_selection}; 
 defaults.ctl.!card ${dmenu_selection};
-EOF
+END
 
 while read -r card; do
     card="${card##* }"
+    card="${card%%-*}"
     if [ "${card}" = "${dmenu_selection}" ]; then
         mute_unmute unmute "${card}"
     else
