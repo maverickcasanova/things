@@ -3,5 +3,5 @@ things
 
 Repository with things too small to place them into separated one, like random scripts and configs.
 
-For more configs one may want to check https://github.com/slashbeast/ansible-like-a-sir
+Most of the configs were moved into  https://github.com/slashbeast/conf-mgmt repo.
 
