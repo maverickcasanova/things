@@ -101,7 +101,7 @@ for i in ${bridges}; do
         ip addr add 172.30.${i}.1/24 dev br-virt${i}
     fi
 
-    # Allow traffic within bridged devices.
+    # Allow all the traffic within particular bridged network.
     iptables -A FORWARD -i br-virt${i} -o br-virt${i} -s 172.30.${i}.0/24 -d 172.30.${i}.0/24 -j ACCEPT
 done
 
@@ -111,7 +111,7 @@ iptables -A FORWARD -d 10.0.0.0/8 -j LOGREJECT
 iptables -A FORWARD -d 172.16.0.0/12 -j LOGREJECT
 iptables -A FORWARD -d 192.168.0.0/16 -j LOGREJECT
 
-# Grant WAN (out-of-bridge and host) access to VMs within bridges.
+# Let VMs/hosts on bridges to access any network address that is not denied above.
 for i in ${bridges}; do
     iptables -t nat -A POSTROUTING -s 172.30.${i}.0/24 ! -d 172.30.0.0/16 -j MASQUERADE
     iptables -A FORWARD -i br-virt${i} -s 172.30.${i}.0/24 -j ACCEPT
