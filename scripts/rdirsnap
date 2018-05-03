@@ -127,4 +127,4 @@ shift 2
 
 snapshot_directory "${dst}"
 dst_run mkdir -p "${dst}"
-run rsync --hard-links --delete --partial --numeric-ids -a --progress "$@" "${src}/" "${remote}${remote:+:}${dst}/"
+run rsync --hard-links --sparse --delete --partial --numeric-ids -a --progress "$@" "${src}/" "${remote}${remote:+:}${dst}/"
