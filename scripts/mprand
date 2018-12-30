@@ -41,6 +41,7 @@ sub queue {
 }
 
 sub preload {
+    return;
     # Fork and return, preload the beginning of file in the child
     # and then gracefully exit.
 
