@@ -13,12 +13,6 @@ update() {
 	fi
 }
 
-update ~/.Xdefaults  configs/DOTXDefaults
-update ~/.config/tint2/tint2rc configs/tint2rc
-update ~/.vimrc configs/DOTvimrc
-update ~/.compton.conf configs/DOTcompton.conf
-update ~/.gitconfig configs/DOTgitconfig && sed -r 's#(name|email) =.*#\1 = NULL#g;' -i configs/DOTgitconfig
-update ~/.mpv/config configs/DOTmpv_slash_config
 update ~/.xmodmap configs/DOTxmodmap
 update ~/.config/user-dirs.dirs configs/user-dirs.dirs
 update ~/.config/dunstrc configs/DOTconfig_dunstrc
